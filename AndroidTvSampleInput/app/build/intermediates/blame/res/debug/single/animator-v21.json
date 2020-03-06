@@ -1,0 +1,14 @@
+[
+    {
+        "merged": "/Users/liuale/Volumes/unix/AmazonSampleInput_Reference/AndroidTvSampleInput/app/build/intermediates/res/merged/debug/animator-v21/lb_playback_bg_fade_out.xml",
+        "source": "/Users/liuale/Volumes/unix/AmazonSampleInput_Reference/AndroidTvSampleInput/app/build/intermediates/exploded-aar/com.android.support/leanback-v17/24.0.0/res/animator-v21/lb_playback_bg_fade_out.xml"
+    },
+    {
+        "merged": "/Users/liuale/Volumes/unix/AmazonSampleInput_Reference/AndroidTvSampleInput/app/build/intermediates/res/merged/debug/animator-v21/lb_playback_description_fade_out.xml",
+        "source": "/Users/liuale/Volumes/unix/AmazonSampleInput_Reference/AndroidTvSampleInput/app/build/intermediates/exploded-aar/com.android.support/leanback-v17/24.0.0/res/animator-v21/lb_playback_description_fade_out.xml"
+    },
+    {
+        "merged": "/Users/liuale/Volumes/unix/AmazonSampleInput_Reference/AndroidTvSampleInput/app/build/intermediates/res/merged/debug/animator-v21/lb_playback_bg_fade_in.xml",
+        "source": "/Users/liuale/Volumes/unix/AmazonSampleInput_Reference/AndroidTvSampleInput/app/build/intermediates/exploded-aar/com.android.support/leanback-v17/24.0.0/res/animator-v21/lb_playback_bg_fade_in.xml"
+    }
+]

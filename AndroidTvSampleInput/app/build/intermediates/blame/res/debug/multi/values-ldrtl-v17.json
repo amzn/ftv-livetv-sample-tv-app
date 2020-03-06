@@ -1,0 +1,64 @@
+[
+    {
+        "outputFile": "/Users/liuale/Volumes/unix/AmazonSampleInput_Reference/AndroidTvSampleInput/app/build/intermediates/incremental/mergeDebugResources/merged.dir/values-ldrtl-v17/values-ldrtl-v17.xml",
+        "map": [
+            {
+                "to": {
+                    "startLine": 2,
+                    "startColumn": 4,
+                    "startOffset": 55,
+                    "endColumn": 77,
+                    "endOffset": 128
+                },
+                "from": {
+                    "file": "/Users/liuale/Volumes/unix/AmazonSampleInput_Reference/AndroidTvSampleInput/app/build/intermediates/exploded-aar/com.android.support/leanback-v17/24.0.0/res/values-ldrtl-v17/values-ldrtl-v17.xml",
+                    "position": {
+                        "startLine": 2,
+                        "startColumn": 4,
+                        "startOffset": 55,
+                        "endColumn": 77,
+                        "endOffset": 128
+                    }
+                }
+            },
+            {
+                "to": {
+                    "startLine": 3,
+                    "startColumn": 4,
+                    "startOffset": 133,
+                    "endColumn": 44,
+                    "endOffset": 173
+                },
+                "from": {
+                    "file": "/Users/liuale/Volumes/unix/AmazonSampleInput_Reference/AndroidTvSampleInput/app/build/intermediates/exploded-aar/com.android.support/leanback-v17/24.0.0/res/values-ldrtl-v17/values-ldrtl-v17.xml",
+                    "position": {
+                        "startLine": 3,
+                        "startColumn": 4,
+                        "startOffset": 133,
+                        "endColumn": 44,
+                        "endOffset": 173
+                    }
+                }
+            },
+            {
+                "to": {
+                    "startLine": 4,
+                    "startColumn": 4,
+                    "startOffset": 178,
+                    "endColumn": 46,
+                    "endOffset": 220
+                },
+                "from": {
+                    "file": "/Users/liuale/Volumes/unix/AmazonSampleInput_Reference/AndroidTvSampleInput/app/build/intermediates/exploded-aar/com.android.support/leanback-v17/24.0.0/res/values-ldrtl-v17/values-ldrtl-v17.xml",
+                    "position": {
+                        "startLine": 4,
+                        "startColumn": 4,
+                        "startOffset": 178,
+                        "endColumn": 46,
+                        "endOffset": 220
+                    }
+                }
+            }
+        ]
+    }
+]

@@ -1,0 +1,82 @@
+[
+    {
+        "merged": "/Users/liuale/Volumes/unix/AmazonSampleInput_Reference/AndroidTvSampleInput/app/build/intermediates/res/merged/debug/animator/lb_guidedactions_item_pressed.xml",
+        "source": "/Users/liuale/Volumes/unix/AmazonSampleInput_Reference/AndroidTvSampleInput/app/build/intermediates/exploded-aar/com.android.support/leanback-v17/24.0.0/res/animator/lb_guidedactions_item_pressed.xml"
+    },
+    {
+        "merged": "/Users/liuale/Volumes/unix/AmazonSampleInput_Reference/AndroidTvSampleInput/app/build/intermediates/res/merged/debug/animator/lb_onboarding_start_button_fade_in.xml",
+        "source": "/Users/liuale/Volumes/unix/AmazonSampleInput_Reference/AndroidTvSampleInput/app/build/intermediates/exploded-aar/com.android.support/leanback-v17/24.0.0/res/animator/lb_onboarding_start_button_fade_in.xml"
+    },
+    {
+        "merged": "/Users/liuale/Volumes/unix/AmazonSampleInput_Reference/AndroidTvSampleInput/app/build/intermediates/res/merged/debug/animator/lb_onboarding_title_enter.xml",
+        "source": "/Users/liuale/Volumes/unix/AmazonSampleInput_Reference/AndroidTvSampleInput/app/build/intermediates/exploded-aar/com.android.support/leanback-v17/24.0.0/res/animator/lb_onboarding_title_enter.xml"
+    },
+    {
+        "merged": "/Users/liuale/Volumes/unix/AmazonSampleInput_Reference/AndroidTvSampleInput/app/build/intermediates/res/merged/debug/animator/lb_playback_rows_fade_out.xml",
+        "source": "/Users/liuale/Volumes/unix/AmazonSampleInput_Reference/AndroidTvSampleInput/app/build/intermediates/exploded-aar/com.android.support/leanback-v17/24.0.0/res/animator/lb_playback_rows_fade_out.xml"
+    },
+    {
+        "merged": "/Users/liuale/Volumes/unix/AmazonSampleInput_Reference/AndroidTvSampleInput/app/build/intermediates/res/merged/debug/animator/lb_guidedstep_slide_down.xml",
+        "source": "/Users/liuale/Volumes/unix/AmazonSampleInput_Reference/AndroidTvSampleInput/app/build/intermediates/exploded-aar/com.android.support/leanback-v17/24.0.0/res/animator/lb_guidedstep_slide_down.xml"
+    },
+    {
+        "merged": "/Users/liuale/Volumes/unix/AmazonSampleInput_Reference/AndroidTvSampleInput/app/build/intermediates/res/merged/debug/animator/lb_onboarding_logo_exit.xml",
+        "source": "/Users/liuale/Volumes/unix/AmazonSampleInput_Reference/AndroidTvSampleInput/app/build/intermediates/exploded-aar/com.android.support/leanback-v17/24.0.0/res/animator/lb_onboarding_logo_exit.xml"
+    },
+    {
+        "merged": "/Users/liuale/Volumes/unix/AmazonSampleInput_Reference/AndroidTvSampleInput/app/build/intermediates/res/merged/debug/animator/lb_playback_controls_fade_out.xml",
+        "source": "/Users/liuale/Volumes/unix/AmazonSampleInput_Reference/AndroidTvSampleInput/app/build/intermediates/exploded-aar/com.android.support/leanback-v17/24.0.0/res/animator/lb_playback_controls_fade_out.xml"
+    },
+    {
+        "merged": "/Users/liuale/Volumes/unix/AmazonSampleInput_Reference/AndroidTvSampleInput/app/build/intermediates/res/merged/debug/animator/lb_decelerator_4.xml",
+        "source": "/Users/liuale/Volumes/unix/AmazonSampleInput_Reference/AndroidTvSampleInput/app/build/intermediates/exploded-aar/com.android.support/leanback-v17/24.0.0/res/animator/lb_decelerator_4.xml"
+    },
+    {
+        "merged": "/Users/liuale/Volumes/unix/AmazonSampleInput_Reference/AndroidTvSampleInput/app/build/intermediates/res/merged/debug/animator/lb_playback_rows_fade_in.xml",
+        "source": "/Users/liuale/Volumes/unix/AmazonSampleInput_Reference/AndroidTvSampleInput/app/build/intermediates/exploded-aar/com.android.support/leanback-v17/24.0.0/res/animator/lb_playback_rows_fade_in.xml"
+    },
+    {
+        "merged": "/Users/liuale/Volumes/unix/AmazonSampleInput_Reference/AndroidTvSampleInput/app/build/intermediates/res/merged/debug/animator/lb_onboarding_page_indicator_enter.xml",
+        "source": "/Users/liuale/Volumes/unix/AmazonSampleInput_Reference/AndroidTvSampleInput/app/build/intermediates/exploded-aar/com.android.support/leanback-v17/24.0.0/res/animator/lb_onboarding_page_indicator_enter.xml"
+    },
+    {
+        "merged": "/Users/liuale/Volumes/unix/AmazonSampleInput_Reference/AndroidTvSampleInput/app/build/intermediates/res/merged/debug/animator/lb_guidedstep_slide_up.xml",
+        "source": "/Users/liuale/Volumes/unix/AmazonSampleInput_Reference/AndroidTvSampleInput/app/build/intermediates/exploded-aar/com.android.support/leanback-v17/24.0.0/res/animator/lb_guidedstep_slide_up.xml"
+    },
+    {
+        "merged": "/Users/liuale/Volumes/unix/AmazonSampleInput_Reference/AndroidTvSampleInput/app/build/intermediates/res/merged/debug/animator/lb_playback_controls_fade_in.xml",
+        "source": "/Users/liuale/Volumes/unix/AmazonSampleInput_Reference/AndroidTvSampleInput/app/build/intermediates/exploded-aar/com.android.support/leanback-v17/24.0.0/res/animator/lb_playback_controls_fade_in.xml"
+    },
+    {
+        "merged": "/Users/liuale/Volumes/unix/AmazonSampleInput_Reference/AndroidTvSampleInput/app/build/intermediates/res/merged/debug/animator/lb_onboarding_start_button_fade_out.xml",
+        "source": "/Users/liuale/Volumes/unix/AmazonSampleInput_Reference/AndroidTvSampleInput/app/build/intermediates/exploded-aar/com.android.support/leanback-v17/24.0.0/res/animator/lb_onboarding_start_button_fade_out.xml"
+    },
+    {
+        "merged": "/Users/liuale/Volumes/unix/AmazonSampleInput_Reference/AndroidTvSampleInput/app/build/intermediates/res/merged/debug/animator/lb_onboarding_logo_enter.xml",
+        "source": "/Users/liuale/Volumes/unix/AmazonSampleInput_Reference/AndroidTvSampleInput/app/build/intermediates/exploded-aar/com.android.support/leanback-v17/24.0.0/res/animator/lb_onboarding_logo_enter.xml"
+    },
+    {
+        "merged": "/Users/liuale/Volumes/unix/AmazonSampleInput_Reference/AndroidTvSampleInput/app/build/intermediates/res/merged/debug/animator/lb_decelerator_2.xml",
+        "source": "/Users/liuale/Volumes/unix/AmazonSampleInput_Reference/AndroidTvSampleInput/app/build/intermediates/exploded-aar/com.android.support/leanback-v17/24.0.0/res/animator/lb_decelerator_2.xml"
+    },
+    {
+        "merged": "/Users/liuale/Volumes/unix/AmazonSampleInput_Reference/AndroidTvSampleInput/app/build/intermediates/res/merged/debug/animator/lb_playback_description_fade_in.xml",
+        "source": "/Users/liuale/Volumes/unix/AmazonSampleInput_Reference/AndroidTvSampleInput/app/build/intermediates/exploded-aar/com.android.support/leanback-v17/24.0.0/res/animator/lb_playback_description_fade_in.xml"
+    },
+    {
+        "merged": "/Users/liuale/Volumes/unix/AmazonSampleInput_Reference/AndroidTvSampleInput/app/build/intermediates/res/merged/debug/animator/lb_guidedactions_item_unpressed.xml",
+        "source": "/Users/liuale/Volumes/unix/AmazonSampleInput_Reference/AndroidTvSampleInput/app/build/intermediates/exploded-aar/com.android.support/leanback-v17/24.0.0/res/animator/lb_guidedactions_item_unpressed.xml"
+    },
+    {
+        "merged": "/Users/liuale/Volumes/unix/AmazonSampleInput_Reference/AndroidTvSampleInput/app/build/intermediates/res/merged/debug/animator/lb_onboarding_page_indicator_fade_in.xml",
+        "source": "/Users/liuale/Volumes/unix/AmazonSampleInput_Reference/AndroidTvSampleInput/app/build/intermediates/exploded-aar/com.android.support/leanback-v17/24.0.0/res/animator/lb_onboarding_page_indicator_fade_in.xml"
+    },
+    {
+        "merged": "/Users/liuale/Volumes/unix/AmazonSampleInput_Reference/AndroidTvSampleInput/app/build/intermediates/res/merged/debug/animator/lb_onboarding_page_indicator_fade_out.xml",
+        "source": "/Users/liuale/Volumes/unix/AmazonSampleInput_Reference/AndroidTvSampleInput/app/build/intermediates/exploded-aar/com.android.support/leanback-v17/24.0.0/res/animator/lb_onboarding_page_indicator_fade_out.xml"
+    },
+    {
+        "merged": "/Users/liuale/Volumes/unix/AmazonSampleInput_Reference/AndroidTvSampleInput/app/build/intermediates/res/merged/debug/animator/lb_onboarding_description_enter.xml",
+        "source": "/Users/liuale/Volumes/unix/AmazonSampleInput_Reference/AndroidTvSampleInput/app/build/intermediates/exploded-aar/com.android.support/leanback-v17/24.0.0/res/animator/lb_onboarding_description_enter.xml"
+    }
+]

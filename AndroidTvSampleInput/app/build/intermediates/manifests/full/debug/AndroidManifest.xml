@@ -1,0 +1,153 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+ Copyright (C) 2015 The Android Open Source Project
+
+     Licensed under the Apache License, Version 2.0 (the "License");
+     you may not use this file except in compliance with the License.
+     You may obtain a copy of the License at
+
+          http://www.apache.org/licenses/LICENSE-2.0
+
+     Unless required by applicable law or agreed to in writing, software
+     distributed under the License is distributed on an "AS IS" BASIS,
+     WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+     See the License for the specific language governing permissions and
+     limitations under the License.
+-->
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    package="com.example.android.sampletvinput"
+    android:versionCode="2"
+    android:versionName="1.1" >
+
+    <uses-sdk
+        android:minSdkVersion="21"
+        android:targetSdkVersion="24" />
+
+    <!-- Required to play internet-based streaming contents. -->
+    <uses-permission android:name="android.permission.INTERNET" />
+
+    <!-- Required to update or read existing channel and program information in TvProvider. -->
+    <uses-permission android:name="com.android.providers.tv.permission.READ_EPG_DATA" />
+
+    <!-- Required to update channel and program information in TvProvider. -->
+    <uses-permission android:name="com.android.providers.tv.permission.WRITE_EPG_DATA" />
+
+    <!--
+    Required to sync EPG data after reboot. For details,
+    please see {@link JobInfo.Builder#setPersisted}
+    -->
+    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
+
+    <uses-feature
+        android:name="android.hardware.touchscreen"
+        android:required="false" />
+    <uses-feature
+        android:name="android.software.leanback"
+        android:required="true" />
+
+    <!--
+    Required to expose this app in the store only when the device has TV input framework
+    with the TV app.
+    -->
+    <uses-feature
+        android:name="android.software.live_tv"
+        android:required="true" />
+
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+
+    <application
+        android:allowBackup="false"
+        android:icon="@drawable/android_48dp"
+        android:label="@string/app_name"
+        android:theme="@style/Theme.Leanback" >
+        <activity android:name="com.example.android.sampletvinput.MainActivity" >
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LEANBACK_LAUNCHER" />
+            </intent-filter>
+        </activity>
+        <activity android:name="com.example.android.sampletvinput.DemoPlayerActivity" >
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+            </intent-filter>
+        </activity>
+        <!--
+        Launched by the TV app before it uses RichTvInputService. This registers channels and
+        sets up SampleJobService to provide program information in the background.
+        -->
+        <activity android:name="com.example.android.sampletvinput.rich.RichTvInputSetupActivity" >
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+            </intent-filter>
+        </activity>
+
+        <!--
+        A full-screen activity which will be launched by the TV app when a user clicks
+        the app-link connected to this activity.
+        -->
+
+
+        <!--
+        A side-panel activity which will be launched by the TV app when a user clicks
+        the app-link connected to this activity.
+        -->
+
+
+        <!--
+        TV input which provides channels based on the streaming contents.
+        Requires "android.permission.BIND_TV_INPUT" to ensure that only system services can bind.
+        This provides the full implementation of TvInputService including EPG, subtitles,
+        multi-audio, parental controls, and overlay view.
+        -->
+        <service
+            android:name="com.example.android.sampletvinput.rich.RichTvInputService"
+            android:label="@string/rich_input_label"
+            android:permission="android.permission.BIND_TV_INPUT" >
+
+            <!-- Required filter used by the system to launch our account service. -->
+            <intent-filter>
+                <action android:name="android.media.tv.TvInputService" />
+            </intent-filter>
+            <!--
+            An XML file which describes this input. This provides pointers to the
+            RichTvInputSetupActivity to the system/TV app.
+            -->
+            <meta-data
+                android:name="android.media.tv.input"
+                android:resource="@xml/richtvinputservice" />
+        </service>
+
+        <!-- This service is for using JobScheduler to sync EPG data. -->
+        <service
+            android:name="com.example.android.sampletvinput.SampleJobService"
+            android:exported="true"
+            android:permission="android.permission.BIND_JOB_SERVICE" />
+
+        <!-- This receiver is for sync job schedule well after reboot. -->
+        <receiver android:name="com.example.android.sampletvinput.rich.RichBootReceiver" >
+            <intent-filter>
+                <action android:name="android.intent.action.BOOT_COMPLETED" />
+            </intent-filter>
+        </receiver>
+        <receiver android:name="com.example.android.sampletvinput.InitializationReceiver" >
+            <intent-filter>
+                <action android:name="android.media.tv.action.INITIALIZE_PROGRAMS" />
+            </intent-filter>
+        </receiver>
+
+        <!-- Required by IMA SDK to fetch the version number of Google Play Service -->
+        <meta-data
+            android:name="com.google.android.gms.version"
+            android:value="@integer/google_play_services_version" />
+        <!-- Include the AdActivity and InAppPurchaseActivity configChanges and themes. -->
+        <activity
+            android:name="com.google.android.gms.ads.AdActivity"
+            android:configChanges="keyboard|keyboardHidden|orientation|screenLayout|uiMode|screenSize|smallestScreenSize"
+            android:theme="@android:style/Theme.Translucent" />
+        <activity
+            android:name="com.google.android.gms.ads.purchase.InAppPurchaseActivity"
+            android:theme="@style/Theme.IAPTheme" />
+    </application>
+
+</manifest>

@@ -1,0 +1,1109 @@
+[
+    {
+        "outputFile": "/Users/liuale/Volumes/unix/AmazonSampleInput_Reference/AndroidTvSampleInput/app/build/intermediates/incremental/mergeDebugResources/merged.dir/values-ja/values-ja.xml",
+        "map": [
+            {
+                "to": {
+                    "startLine": 2,
+                    "startColumn": 4,
+                    "startOffset": 105,
+                    "endColumn": 96,
+                    "endOffset": 197
+                },
+                "from": {
+                    "file": "/Users/liuale/Volumes/unix/AmazonSampleInput_Reference/AndroidTvSampleInput/app/build/intermediates/exploded-aar/com.android.support/appcompat-v7/24.0.0/res/values-ja/values-ja.xml",
+                    "position": {
+                        "startLine": 2,
+                        "startColumn": 4,
+                        "startOffset": 55,
+                        "endColumn": 96,
+                        "endOffset": 147
+                    }
+                }
+            },
+            {
+                "to": {
+                    "startLine": 3,
+                    "startColumn": 4,
+                    "startOffset": 202,
+                    "endColumn": 106,
+                    "endOffset": 304
+                },
+                "from": {
+                    "file": "/Users/liuale/Volumes/unix/AmazonSampleInput_Reference/AndroidTvSampleInput/app/build/intermediates/exploded-aar/com.android.support/appcompat-v7/24.0.0/res/values-ja/values-ja.xml",
+                    "position": {
+                        "startLine": 3,
+                        "startColumn": 4,
+                        "startOffset": 152,
+                        "endColumn": 106,
+                        "endOffset": 254
+                    }
+                }
+            },
+            {
+                "to": {
+                    "startLine": 4,
+                    "startColumn": 4,
+                    "startOffset": 309,
+                    "endColumn": 120,
+                    "endOffset": 425
+                },
+                "from": {
+                    "file": "/Users/liuale/Volumes/unix/AmazonSampleInput_Reference/AndroidTvSampleInput/app/build/intermediates/exploded-aar/com.android.support/appcompat-v7/24.0.0/res/values-ja/values-ja.xml",
+                    "position": {
+                        "startLine": 4,
+                        "startColumn": 4,
+                        "startOffset": 259,
+                        "endColumn": 120,
+                        "endOffset": 375
+                    }
+                }
+            },
+            {
+                "to": {
+                    "startLine": 5,
+                    "startColumn": 4,
+                    "startOffset": 430,
+                    "endColumn": 92,
+                    "endOffset": 518
+                },
+                "from": {
+                    "file": "/Users/liuale/Volumes/unix/AmazonSampleInput_Reference/AndroidTvSampleInput/app/build/intermediates/exploded-aar/com.android.support/appcompat-v7/24.0.0/res/values-ja/values-ja.xml",
+                    "position": {
+                        "startLine": 5,
+                        "startColumn": 4,
+                        "startOffset": 380,
+                        "endColumn": 92,
+                        "endOffset": 468
+                    }
+                }
+            },
+            {
+                "to": {
+                    "startLine": 6,
+                    "startColumn": 4,
+                    "startOffset": 523,
+                    "endColumn": 104,
+                    "endOffset": 623
+                },
+                "from": {
+                    "file": "/Users/liuale/Volumes/unix/AmazonSampleInput_Reference/AndroidTvSampleInput/app/build/intermediates/exploded-aar/com.android.support/appcompat-v7/24.0.0/res/values-ja/values-ja.xml",
+                    "position": {
+                        "startLine": 6,
+                        "startColumn": 4,
+                        "startOffset": 473,
+                        "endColumn": 104,
+                        "endOffset": 573
+                    }
+                }
+            },
+            {
+                "to": {
+                    "startLine": 7,
+                    "startColumn": 4,
+                    "startOffset": 628,
+                    "endColumn": 81,
+                    "endOffset": 705
+                },
+                "from": {
+                    "file": "/Users/liuale/Volumes/unix/AmazonSampleInput_Reference/AndroidTvSampleInput/app/build/intermediates/exploded-aar/com.android.support/appcompat-v7/24.0.0/res/values-ja/values-ja.xml",
+                    "position": {
+                        "startLine": 7,
+                        "startColumn": 4,
+                        "startOffset": 578,
+                        "endColumn": 81,
+                        "endOffset": 655
+                    }
+                }
+            },
+            {
+                "to": {
+                    "startLine": 8,
+                    "startColumn": 4,
+                    "startOffset": 710,
+                    "endColumn": 97,
+                    "endOffset": 803
+                },
+                "from": {
+                    "file": "/Users/liuale/Volumes/unix/AmazonSampleInput_Reference/AndroidTvSampleInput/app/build/intermediates/exploded-aar/com.android.support/appcompat-v7/24.0.0/res/values-ja/values-ja.xml",
+                    "position": {
+                        "startLine": 8,
+                        "startColumn": 4,
+                        "startOffset": 660,
+                        "endColumn": 97,
+                        "endOffset": 753
+                    }
+                }
+            },
+            {
+                "to": {
+                    "startLine": 9,
+                    "startColumn": 4,
+                    "startOffset": 808,
+                    "endColumn": 107,
+                    "endOffset": 911
+                },
+                "from": {
+                    "file": "/Users/liuale/Volumes/unix/AmazonSampleInput_Reference/AndroidTvSampleInput/app/build/intermediates/exploded-aar/com.android.support/appcompat-v7/24.0.0/res/values-ja/values-ja.xml",
+                    "position": {
+                        "startLine": 9,
+                        "startColumn": 4,
+                        "startOffset": 758,
+                        "endColumn": 107,
+                        "endOffset": 861
+                    }
+                }
+            },
+            {
+                "to": {
+                    "startLine": 10,
+                    "startColumn": 4,
+                    "startOffset": 916,
+                    "endColumn": 76,
+                    "endOffset": 988
+                },
+                "from": {
+                    "file": "/Users/liuale/Volumes/unix/AmazonSampleInput_Reference/AndroidTvSampleInput/app/build/intermediates/exploded-aar/com.android.support/appcompat-v7/24.0.0/res/values-ja/values-ja.xml",
+                    "position": {
+                        "startLine": 10,
+                        "startColumn": 4,
+                        "startOffset": 866,
+                        "endColumn": 76,
+                        "endOffset": 938
+                    }
+                }
+            },
+            {
+                "to": {
+                    "startLine": 11,
+                    "startColumn": 4,
+                    "startOffset": 993,
+                    "endColumn": 75,
+                    "endOffset": 1064
+                },
+                "from": {
+                    "file": "/Users/liuale/Volumes/unix/AmazonSampleInput_Reference/AndroidTvSampleInput/app/build/intermediates/exploded-aar/com.android.support/appcompat-v7/24.0.0/res/values-ja/values-ja.xml",
+                    "position": {
+                        "startLine": 11,
+                        "startColumn": 4,
+                        "startOffset": 943,
+                        "endColumn": 75,
+                        "endOffset": 1014
+                    }
+                }
+            },
+            {
+                "to": {
+                    "startLine": 12,
+                    "startColumn": 4,
+                    "startOffset": 1069,
+                    "endColumn": 77,
+                    "endOffset": 1142
+                },
+                "from": {
+                    "file": "/Users/liuale/Volumes/unix/AmazonSampleInput_Reference/AndroidTvSampleInput/app/build/intermediates/exploded-aar/com.android.support/appcompat-v7/24.0.0/res/values-ja/values-ja.xml",
+                    "position": {
+                        "startLine": 12,
+                        "startColumn": 4,
+                        "startOffset": 1019,
+                        "endColumn": 77,
+                        "endOffset": 1092
+                    }
+                }
+            },
+            {
+                "to": {
+                    "startLine": 13,
+                    "startColumn": 4,
+                    "startOffset": 1147,
+                    "endColumn": 101,
+                    "endOffset": 1244
+                },
+                "from": {
+                    "file": "/Users/liuale/Volumes/unix/AmazonSampleInput_Reference/AndroidTvSampleInput/app/build/intermediates/exploded-aar/com.android.support/appcompat-v7/24.0.0/res/values-ja/values-ja.xml",
+                    "position": {
+                        "startLine": 13,
+                        "startColumn": 4,
+                        "startOffset": 1097,
+                        "endColumn": 101,
+                        "endOffset": 1194
+                    }
+                }
+            },
+            {
+                "to": {
+                    "startLine": 14,
+                    "startColumn": 4,
+                    "startOffset": 1249,
+                    "endColumn": 98,
+                    "endOffset": 1343
+                },
+                "from": {
+                    "file": "/Users/liuale/Volumes/unix/AmazonSampleInput_Reference/AndroidTvSampleInput/app/build/intermediates/exploded-aar/com.android.support/appcompat-v7/24.0.0/res/values-ja/values-ja.xml",
+                    "position": {
+                        "startLine": 14,
+                        "startColumn": 4,
+                        "startOffset": 1199,
+                        "endColumn": 98,
+                        "endOffset": 1293
+                    }
+                }
+            },
+            {
+                "to": {
+                    "startLine": 15,
+                    "startColumn": 4,
+                    "startOffset": 1348,
+                    "endColumn": 94,
+                    "endOffset": 1438
+                },
+                "from": {
+                    "file": "/Users/liuale/Volumes/unix/AmazonSampleInput_Reference/AndroidTvSampleInput/app/build/intermediates/exploded-aar/com.android.support/appcompat-v7/24.0.0/res/values-ja/values-ja.xml",
+                    "position": {
+                        "startLine": 15,
+                        "startColumn": 4,
+                        "startOffset": 1298,
+                        "endColumn": 94,
+                        "endOffset": 1388
+                    }
+                }
+            },
+            {
+                "to": {
+                    "startLine": 16,
+                    "startColumn": 4,
+                    "startOffset": 1443,
+                    "endColumn": 102,
+                    "endOffset": 1541
+                },
+                "from": {
+                    "file": "/Users/liuale/Volumes/unix/AmazonSampleInput_Reference/AndroidTvSampleInput/app/build/intermediates/exploded-aar/com.android.support/appcompat-v7/24.0.0/res/values-ja/values-ja.xml",
+                    "position": {
+                        "startLine": 16,
+                        "startColumn": 4,
+                        "startOffset": 1393,
+                        "endColumn": 102,
+                        "endOffset": 1491
+                    }
+                }
+            },
+            {
+                "to": {
+                    "startLine": 17,
+                    "startColumn": 4,
+                    "startOffset": 1546,
+                    "endColumn": 94,
+                    "endOffset": 1636
+                },
+                "from": {
+                    "file": "/Users/liuale/Volumes/unix/AmazonSampleInput_Reference/AndroidTvSampleInput/app/build/intermediates/exploded-aar/com.android.support/appcompat-v7/24.0.0/res/values-ja/values-ja.xml",
+                    "position": {
+                        "startLine": 17,
+                        "startColumn": 4,
+                        "startOffset": 1496,
+                        "endColumn": 94,
+                        "endOffset": 1586
+                    }
+                }
+            },
+            {
+                "to": {
+                    "startLine": 18,
+                    "startColumn": 4,
+                    "startOffset": 1641,
+                    "endColumn": 95,
+                    "endOffset": 1732
+                },
+                "from": {
+                    "file": "/Users/liuale/Volumes/unix/AmazonSampleInput_Reference/AndroidTvSampleInput/app/build/intermediates/exploded-aar/com.android.support/appcompat-v7/24.0.0/res/values-ja/values-ja.xml",
+                    "position": {
+                        "startLine": 18,
+                        "startColumn": 4,
+                        "startOffset": 1591,
+                        "endColumn": 95,
+                        "endOffset": 1682
+                    }
+                }
+            },
+            {
+                "to": {
+                    "startLine": 19,
+                    "startColumn": 4,
+                    "startOffset": 1737,
+                    "endColumn": 110,
+                    "endOffset": 1843
+                },
+                "from": {
+                    "file": "/Users/liuale/Volumes/unix/AmazonSampleInput_Reference/AndroidTvSampleInput/app/build/intermediates/exploded-aar/com.android.support/appcompat-v7/24.0.0/res/values-ja/values-ja.xml",
+                    "position": {
+                        "startLine": 19,
+                        "startColumn": 4,
+                        "startOffset": 1687,
+                        "endColumn": 110,
+                        "endOffset": 1793
+                    }
+                }
+            },
+            {
+                "to": {
+                    "startLine": 20,
+                    "startColumn": 4,
+                    "startOffset": 1848,
+                    "endColumn": 96,
+                    "endOffset": 1940
+                },
+                "from": {
+                    "file": "/Users/liuale/Volumes/unix/AmazonSampleInput_Reference/AndroidTvSampleInput/app/build/intermediates/exploded-aar/com.android.support/appcompat-v7/24.0.0/res/values-ja/values-ja.xml",
+                    "position": {
+                        "startLine": 20,
+                        "startColumn": 4,
+                        "startOffset": 1798,
+                        "endColumn": 96,
+                        "endOffset": 1890
+                    }
+                }
+            },
+            {
+                "to": {
+                    "startLine": 21,
+                    "startColumn": 4,
+                    "startOffset": 1945,
+                    "endColumn": 196,
+                    "endOffset": 2137
+                },
+                "from": {
+                    "file": "/Users/liuale/Volumes/unix/AmazonSampleInput_Reference/AndroidTvSampleInput/app/build/intermediates/exploded-aar/com.google.android.gms/play-services-basement/8.4.0/res/values-ja/common_strings.xml",
+                    "position": {
+                        "startLine": 3,
+                        "startColumn": 4,
+                        "startOffset": 170,
+                        "endColumn": 200,
+                        "endOffset": 366
+                    }
+                }
+            },
+            {
+                "to": {
+                    "startLine": 22,
+                    "startColumn": 4,
+                    "startOffset": 2142,
+                    "endColumn": 106,
+                    "endOffset": 2244
+                },
+                "from": {
+                    "file": "/Users/liuale/Volumes/unix/AmazonSampleInput_Reference/AndroidTvSampleInput/app/build/intermediates/exploded-aar/com.android.support/leanback-v17/24.0.0/res/values-ja/values-ja.xml",
+                    "position": {
+                        "startLine": 2,
+                        "startColumn": 4,
+                        "startOffset": 105,
+                        "endColumn": 106,
+                        "endOffset": 207
+                    }
+                }
+            },
+            {
+                "to": {
+                    "startLine": 23,
+                    "startColumn": 4,
+                    "startOffset": 2249,
+                    "endColumn": 100,
+                    "endOffset": 2345
+                },
+                "from": {
+                    "file": "/Users/liuale/Volumes/unix/AmazonSampleInput_Reference/AndroidTvSampleInput/app/build/intermediates/exploded-aar/com.android.support/leanback-v17/24.0.0/res/values-ja/values-ja.xml",
+                    "position": {
+                        "startLine": 3,
+                        "startColumn": 4,
+                        "startOffset": 212,
+                        "endColumn": 100,
+                        "endOffset": 308
+                    }
+                }
+            },
+            {
+                "to": {
+                    "startLine": 24,
+                    "startColumn": 4,
+                    "startOffset": 2350,
+                    "endColumn": 77,
+                    "endOffset": 2423
+                },
+                "from": {
+                    "file": "/Users/liuale/Volumes/unix/AmazonSampleInput_Reference/AndroidTvSampleInput/app/build/intermediates/exploded-aar/com.android.support/leanback-v17/24.0.0/res/values-ja/values-ja.xml",
+                    "position": {
+                        "startLine": 4,
+                        "startColumn": 4,
+                        "startOffset": 313,
+                        "endColumn": 77,
+                        "endOffset": 386
+                    }
+                }
+            },
+            {
+                "to": {
+                    "startLine": 25,
+                    "startColumn": 4,
+                    "startOffset": 2428,
+                    "endColumn": 91,
+                    "endOffset": 2515
+                },
+                "from": {
+                    "file": "/Users/liuale/Volumes/unix/AmazonSampleInput_Reference/AndroidTvSampleInput/app/build/intermediates/exploded-aar/com.android.support/leanback-v17/24.0.0/res/values-ja/values-ja.xml",
+                    "position": {
+                        "startLine": 5,
+                        "startColumn": 4,
+                        "startOffset": 391,
+                        "endColumn": 91,
+                        "endOffset": 478
+                    }
+                }
+            },
+            {
+                "to": {
+                    "startLine": 26,
+                    "startColumn": 4,
+                    "startOffset": 2520,
+                    "endColumn": 89,
+                    "endOffset": 2605
+                },
+                "from": {
+                    "file": "/Users/liuale/Volumes/unix/AmazonSampleInput_Reference/AndroidTvSampleInput/app/build/intermediates/exploded-aar/com.android.support/leanback-v17/24.0.0/res/values-ja/values-ja.xml",
+                    "position": {
+                        "startLine": 6,
+                        "startColumn": 4,
+                        "startOffset": 483,
+                        "endColumn": 89,
+                        "endOffset": 568
+                    }
+                }
+            },
+            {
+                "to": {
+                    "startLine": 27,
+                    "startColumn": 4,
+                    "startOffset": 2610,
+                    "endColumn": 108,
+                    "endOffset": 2714
+                },
+                "from": {
+                    "file": "/Users/liuale/Volumes/unix/AmazonSampleInput_Reference/AndroidTvSampleInput/app/build/intermediates/exploded-aar/com.android.support/leanback-v17/24.0.0/res/values-ja/values-ja.xml",
+                    "position": {
+                        "startLine": 7,
+                        "startColumn": 4,
+                        "startOffset": 573,
+                        "endColumn": 108,
+                        "endOffset": 677
+                    }
+                }
+            },
+            {
+                "to": {
+                    "startLine": 28,
+                    "startColumn": 4,
+                    "startOffset": 2719,
+                    "endColumn": 93,
+                    "endOffset": 2808
+                },
+                "from": {
+                    "file": "/Users/liuale/Volumes/unix/AmazonSampleInput_Reference/AndroidTvSampleInput/app/build/intermediates/exploded-aar/com.android.support/leanback-v17/24.0.0/res/values-ja/values-ja.xml",
+                    "position": {
+                        "startLine": 8,
+                        "startColumn": 4,
+                        "startOffset": 682,
+                        "endColumn": 93,
+                        "endOffset": 771
+                    }
+                }
+            },
+            {
+                "to": {
+                    "startLine": 29,
+                    "startColumn": 4,
+                    "startOffset": 2813,
+                    "endColumn": 89,
+                    "endOffset": 2898
+                },
+                "from": {
+                    "file": "/Users/liuale/Volumes/unix/AmazonSampleInput_Reference/AndroidTvSampleInput/app/build/intermediates/exploded-aar/com.android.support/leanback-v17/24.0.0/res/values-ja/values-ja.xml",
+                    "position": {
+                        "startLine": 9,
+                        "startColumn": 4,
+                        "startOffset": 776,
+                        "endColumn": 89,
+                        "endOffset": 861
+                    }
+                }
+            },
+            {
+                "to": {
+                    "startLine": 30,
+                    "startColumn": 4,
+                    "startOffset": 2903,
+                    "endColumn": 113,
+                    "endOffset": 3012
+                },
+                "from": {
+                    "file": "/Users/liuale/Volumes/unix/AmazonSampleInput_Reference/AndroidTvSampleInput/app/build/intermediates/exploded-aar/com.android.support/leanback-v17/24.0.0/res/values-ja/values-ja.xml",
+                    "position": {
+                        "startLine": 10,
+                        "startColumn": 4,
+                        "startOffset": 866,
+                        "endColumn": 113,
+                        "endOffset": 975
+                    }
+                }
+            },
+            {
+                "to": {
+                    "startLine": 31,
+                    "startColumn": 4,
+                    "startOffset": 3017,
+                    "endColumn": 112,
+                    "endOffset": 3125
+                },
+                "from": {
+                    "file": "/Users/liuale/Volumes/unix/AmazonSampleInput_Reference/AndroidTvSampleInput/app/build/intermediates/exploded-aar/com.android.support/leanback-v17/24.0.0/res/values-ja/values-ja.xml",
+                    "position": {
+                        "startLine": 11,
+                        "startColumn": 4,
+                        "startOffset": 980,
+                        "endColumn": 112,
+                        "endOffset": 1088
+                    }
+                }
+            },
+            {
+                "to": {
+                    "startLine": 32,
+                    "startColumn": 4,
+                    "startOffset": 3130,
+                    "endColumn": 95,
+                    "endOffset": 3221
+                },
+                "from": {
+                    "file": "/Users/liuale/Volumes/unix/AmazonSampleInput_Reference/AndroidTvSampleInput/app/build/intermediates/exploded-aar/com.android.support/leanback-v17/24.0.0/res/values-ja/values-ja.xml",
+                    "position": {
+                        "startLine": 12,
+                        "startColumn": 4,
+                        "startOffset": 1093,
+                        "endColumn": 95,
+                        "endOffset": 1184
+                    }
+                }
+            },
+            {
+                "to": {
+                    "startLine": 33,
+                    "startColumn": 4,
+                    "startOffset": 3226,
+                    "endColumn": 111,
+                    "endOffset": 3333
+                },
+                "from": {
+                    "file": "/Users/liuale/Volumes/unix/AmazonSampleInput_Reference/AndroidTvSampleInput/app/build/intermediates/exploded-aar/com.android.support/leanback-v17/24.0.0/res/values-ja/values-ja.xml",
+                    "position": {
+                        "startLine": 13,
+                        "startColumn": 4,
+                        "startOffset": 1189,
+                        "endColumn": 111,
+                        "endOffset": 1296
+                    }
+                }
+            },
+            {
+                "to": {
+                    "startLine": 34,
+                    "startColumn": 4,
+                    "startOffset": 3338,
+                    "endColumn": 109,
+                    "endOffset": 3443
+                },
+                "from": {
+                    "file": "/Users/liuale/Volumes/unix/AmazonSampleInput_Reference/AndroidTvSampleInput/app/build/intermediates/exploded-aar/com.android.support/leanback-v17/24.0.0/res/values-ja/values-ja.xml",
+                    "position": {
+                        "startLine": 14,
+                        "startColumn": 4,
+                        "startOffset": 1301,
+                        "endColumn": 109,
+                        "endOffset": 1406
+                    }
+                }
+            },
+            {
+                "to": {
+                    "startLine": 35,
+                    "startColumn": 4,
+                    "startOffset": 3448,
+                    "endColumn": 107,
+                    "endOffset": 3551
+                },
+                "from": {
+                    "file": "/Users/liuale/Volumes/unix/AmazonSampleInput_Reference/AndroidTvSampleInput/app/build/intermediates/exploded-aar/com.android.support/leanback-v17/24.0.0/res/values-ja/values-ja.xml",
+                    "position": {
+                        "startLine": 15,
+                        "startColumn": 4,
+                        "startOffset": 1411,
+                        "endColumn": 107,
+                        "endOffset": 1514
+                    }
+                }
+            },
+            {
+                "to": {
+                    "startLine": 36,
+                    "startColumn": 4,
+                    "startOffset": 3556,
+                    "endColumn": 98,
+                    "endOffset": 3650
+                },
+                "from": {
+                    "file": "/Users/liuale/Volumes/unix/AmazonSampleInput_Reference/AndroidTvSampleInput/app/build/intermediates/exploded-aar/com.android.support/leanback-v17/24.0.0/res/values-ja/values-ja.xml",
+                    "position": {
+                        "startLine": 16,
+                        "startColumn": 4,
+                        "startOffset": 1519,
+                        "endColumn": 98,
+                        "endOffset": 1613
+                    }
+                }
+            },
+            {
+                "to": {
+                    "startLine": 37,
+                    "startColumn": 4,
+                    "startOffset": 3655,
+                    "endColumn": 89,
+                    "endOffset": 3740
+                },
+                "from": {
+                    "file": "/Users/liuale/Volumes/unix/AmazonSampleInput_Reference/AndroidTvSampleInput/app/build/intermediates/exploded-aar/com.android.support/leanback-v17/24.0.0/res/values-ja/values-ja.xml",
+                    "position": {
+                        "startLine": 17,
+                        "startColumn": 4,
+                        "startOffset": 1618,
+                        "endColumn": 89,
+                        "endOffset": 1703
+                    }
+                }
+            },
+            {
+                "to": {
+                    "startLine": 38,
+                    "startColumn": 4,
+                    "startOffset": 3745,
+                    "endColumn": 108,
+                    "endOffset": 3849
+                },
+                "from": {
+                    "file": "/Users/liuale/Volumes/unix/AmazonSampleInput_Reference/AndroidTvSampleInput/app/build/intermediates/exploded-aar/com.android.support/leanback-v17/24.0.0/res/values-ja/values-ja.xml",
+                    "position": {
+                        "startLine": 18,
+                        "startColumn": 4,
+                        "startOffset": 1708,
+                        "endColumn": 108,
+                        "endOffset": 1812
+                    }
+                }
+            },
+            {
+                "to": {
+                    "startLine": 39,
+                    "startColumn": 4,
+                    "startOffset": 3854,
+                    "endColumn": 85,
+                    "endOffset": 3935
+                },
+                "from": {
+                    "file": "/Users/liuale/Volumes/unix/AmazonSampleInput_Reference/AndroidTvSampleInput/app/build/intermediates/exploded-aar/com.android.support/leanback-v17/24.0.0/res/values-ja/values-ja.xml",
+                    "position": {
+                        "startLine": 19,
+                        "startColumn": 4,
+                        "startOffset": 1817,
+                        "endColumn": 85,
+                        "endOffset": 1898
+                    }
+                }
+            },
+            {
+                "to": {
+                    "startLine": 40,
+                    "startColumn": 4,
+                    "startOffset": 3940,
+                    "endColumn": 97,
+                    "endOffset": 4033
+                },
+                "from": {
+                    "file": "/Users/liuale/Volumes/unix/AmazonSampleInput_Reference/AndroidTvSampleInput/app/build/intermediates/exploded-aar/com.android.support/leanback-v17/24.0.0/res/values-ja/values-ja.xml",
+                    "position": {
+                        "startLine": 20,
+                        "startColumn": 4,
+                        "startOffset": 1903,
+                        "endColumn": 97,
+                        "endOffset": 1996
+                    }
+                }
+            },
+            {
+                "to": {
+                    "startLine": 41,
+                    "startColumn": 4,
+                    "startOffset": 4038,
+                    "endColumn": 95,
+                    "endOffset": 4129
+                },
+                "from": {
+                    "file": "/Users/liuale/Volumes/unix/AmazonSampleInput_Reference/AndroidTvSampleInput/app/build/intermediates/exploded-aar/com.android.support/leanback-v17/24.0.0/res/values-ja/values-ja.xml",
+                    "position": {
+                        "startLine": 21,
+                        "startColumn": 4,
+                        "startOffset": 2001,
+                        "endColumn": 95,
+                        "endOffset": 2092
+                    }
+                }
+            },
+            {
+                "to": {
+                    "startLine": 42,
+                    "startColumn": 4,
+                    "startOffset": 4134,
+                    "endColumn": 97,
+                    "endOffset": 4227
+                },
+                "from": {
+                    "file": "/Users/liuale/Volumes/unix/AmazonSampleInput_Reference/AndroidTvSampleInput/app/build/intermediates/exploded-aar/com.android.support/leanback-v17/24.0.0/res/values-ja/values-ja.xml",
+                    "position": {
+                        "startLine": 22,
+                        "startColumn": 4,
+                        "startOffset": 2097,
+                        "endColumn": 97,
+                        "endOffset": 2190
+                    }
+                }
+            },
+            {
+                "to": {
+                    "startLine": 43,
+                    "startColumn": 4,
+                    "startOffset": 4232,
+                    "endColumn": 90,
+                    "endOffset": 4318
+                },
+                "from": {
+                    "file": "/Users/liuale/Volumes/unix/AmazonSampleInput_Reference/AndroidTvSampleInput/app/build/intermediates/exploded-aar/com.android.support/leanback-v17/24.0.0/res/values-ja/values-ja.xml",
+                    "position": {
+                        "startLine": 23,
+                        "startColumn": 4,
+                        "startOffset": 2195,
+                        "endColumn": 90,
+                        "endOffset": 2281
+                    }
+                }
+            },
+            {
+                "to": {
+                    "startLine": 44,
+                    "startColumn": 4,
+                    "startOffset": 4323,
+                    "endColumn": 106,
+                    "endOffset": 4425
+                },
+                "from": {
+                    "file": "/Users/liuale/Volumes/unix/AmazonSampleInput_Reference/AndroidTvSampleInput/app/build/intermediates/exploded-aar/com.android.support/leanback-v17/24.0.0/res/values-ja/values-ja.xml",
+                    "position": {
+                        "startLine": 24,
+                        "startColumn": 4,
+                        "startOffset": 2286,
+                        "endColumn": 106,
+                        "endOffset": 2388
+                    }
+                }
+            },
+            {
+                "to": {
+                    "startLine": 45,
+                    "startColumn": 4,
+                    "startOffset": 4430,
+                    "endColumn": 106,
+                    "endOffset": 4532
+                },
+                "from": {
+                    "file": "/Users/liuale/Volumes/unix/AmazonSampleInput_Reference/AndroidTvSampleInput/app/build/intermediates/exploded-aar/com.android.support/leanback-v17/24.0.0/res/values-ja/values-ja.xml",
+                    "position": {
+                        "startLine": 25,
+                        "startColumn": 4,
+                        "startOffset": 2393,
+                        "endColumn": 106,
+                        "endOffset": 2495
+                    }
+                }
+            },
+            {
+                "to": {
+                    "startLine": 46,
+                    "startColumn": 4,
+                    "startOffset": 4537,
+                    "endColumn": 105,
+                    "endOffset": 4638
+                },
+                "from": {
+                    "file": "/Users/liuale/Volumes/unix/AmazonSampleInput_Reference/AndroidTvSampleInput/app/build/intermediates/exploded-aar/com.android.support/leanback-v17/24.0.0/res/values-ja/values-ja.xml",
+                    "position": {
+                        "startLine": 26,
+                        "startColumn": 4,
+                        "startOffset": 2500,
+                        "endColumn": 105,
+                        "endOffset": 2601
+                    }
+                }
+            },
+            {
+                "to": {
+                    "startLine": 47,
+                    "startColumn": 4,
+                    "startOffset": 4643,
+                    "endColumn": 97,
+                    "endOffset": 4736
+                },
+                "from": {
+                    "file": "/Users/liuale/Volumes/unix/AmazonSampleInput_Reference/AndroidTvSampleInput/app/build/intermediates/exploded-aar/com.android.support/leanback-v17/24.0.0/res/values-ja/values-ja.xml",
+                    "position": {
+                        "startLine": 27,
+                        "startColumn": 4,
+                        "startOffset": 2606,
+                        "endColumn": 97,
+                        "endOffset": 2699
+                    }
+                }
+            },
+            {
+                "to": {
+                    "startLine": 48,
+                    "startColumn": 4,
+                    "startOffset": 4741,
+                    "endColumn": 101,
+                    "endOffset": 4838
+                },
+                "from": {
+                    "file": "/Users/liuale/Volumes/unix/AmazonSampleInput_Reference/AndroidTvSampleInput/app/build/intermediates/exploded-aar/com.android.support/leanback-v17/24.0.0/res/values-ja/values-ja.xml",
+                    "position": {
+                        "startLine": 28,
+                        "startColumn": 4,
+                        "startOffset": 2704,
+                        "endColumn": 101,
+                        "endOffset": 2801
+                    }
+                }
+            },
+            {
+                "to": {
+                    "startLine": 49,
+                    "startColumn": 4,
+                    "startOffset": 4843,
+                    "endColumn": 100,
+                    "endOffset": 4939
+                },
+                "from": {
+                    "file": "/Users/liuale/Volumes/unix/AmazonSampleInput_Reference/AndroidTvSampleInput/app/build/intermediates/exploded-aar/com.android.support/leanback-v17/24.0.0/res/values-ja/values-ja.xml",
+                    "position": {
+                        "startLine": 29,
+                        "startColumn": 4,
+                        "startOffset": 2806,
+                        "endColumn": 100,
+                        "endOffset": 2902
+                    }
+                }
+            },
+            {
+                "to": {
+                    "startLine": 50,
+                    "startColumn": 4,
+                    "startOffset": 4944,
+                    "endColumn": 105,
+                    "endOffset": 5045
+                },
+                "from": {
+                    "file": "/Users/liuale/Volumes/unix/AmazonSampleInput_Reference/AndroidTvSampleInput/app/build/intermediates/exploded-aar/com.android.support/leanback-v17/24.0.0/res/values-ja/values-ja.xml",
+                    "position": {
+                        "startLine": 30,
+                        "startColumn": 4,
+                        "startOffset": 2907,
+                        "endColumn": 105,
+                        "endOffset": 3008
+                    }
+                }
+            },
+            {
+                "to": {
+                    "startLine": 51,
+                    "startColumn": 4,
+                    "startOffset": 5050,
+                    "endColumn": 97,
+                    "endOffset": 5143
+                },
+                "from": {
+                    "file": "/Users/liuale/Volumes/unix/AmazonSampleInput_Reference/AndroidTvSampleInput/app/build/intermediates/exploded-aar/com.android.support/leanback-v17/24.0.0/res/values-ja/values-ja.xml",
+                    "position": {
+                        "startLine": 31,
+                        "startColumn": 4,
+                        "startOffset": 3013,
+                        "endColumn": 97,
+                        "endOffset": 3106
+                    }
+                }
+            },
+            {
+                "to": {
+                    "startLine": 52,
+                    "startColumn": 4,
+                    "startOffset": 5148,
+                    "endColumn": 102,
+                    "endOffset": 5246
+                },
+                "from": {
+                    "file": "/Users/liuale/Volumes/unix/AmazonSampleInput_Reference/AndroidTvSampleInput/app/build/intermediates/exploded-aar/com.android.support/leanback-v17/24.0.0/res/values-ja/values-ja.xml",
+                    "position": {
+                        "startLine": 32,
+                        "startColumn": 4,
+                        "startOffset": 3111,
+                        "endColumn": 102,
+                        "endOffset": 3209
+                    }
+                }
+            },
+            {
+                "to": {
+                    "startLine": 53,
+                    "startColumn": 4,
+                    "startOffset": 5251,
+                    "endColumn": 79,
+                    "endOffset": 5326
+                },
+                "from": {
+                    "file": "/Users/liuale/Volumes/unix/AmazonSampleInput_Reference/AndroidTvSampleInput/app/build/intermediates/exploded-aar/com.android.support/leanback-v17/24.0.0/res/values-ja/values-ja.xml",
+                    "position": {
+                        "startLine": 33,
+                        "startColumn": 4,
+                        "startOffset": 3214,
+                        "endColumn": 79,
+                        "endOffset": 3289
+                    }
+                }
+            },
+            {
+                "to": {
+                    "startLine": 54,
+                    "startColumn": 4,
+                    "startOffset": 5331,
+                    "endColumn": 88,
+                    "endOffset": 5415
+                },
+                "from": {
+                    "file": "/Users/liuale/Volumes/unix/AmazonSampleInput_Reference/AndroidTvSampleInput/app/build/intermediates/exploded-aar/com.android.support/leanback-v17/24.0.0/res/values-ja/values-ja.xml",
+                    "position": {
+                        "startLine": 34,
+                        "startColumn": 4,
+                        "startOffset": 3294,
+                        "endColumn": 88,
+                        "endOffset": 3378
+                    }
+                }
+            },
+            {
+                "to": {
+                    "startLine": 55,
+                    "startColumn": 4,
+                    "startOffset": 5420,
+                    "endColumn": 130,
+                    "endOffset": 5546
+                },
+                "from": {
+                    "file": "/Users/liuale/Volumes/unix/AmazonSampleInput_Reference/AndroidTvSampleInput/app/build/intermediates/exploded-aar/com.android.support/leanback-v17/24.0.0/res/values-ja/values-ja.xml",
+                    "position": {
+                        "startLine": 35,
+                        "startColumn": 4,
+                        "startOffset": 3383,
+                        "endColumn": 130,
+                        "endOffset": 3509
+                    }
+                }
+            },
+            {
+                "to": {
+                    "startLine": 56,
+                    "startColumn": 4,
+                    "startOffset": 5551,
+                    "endColumn": 139,
+                    "endOffset": 5686
+                },
+                "from": {
+                    "file": "/Users/liuale/Volumes/unix/AmazonSampleInput_Reference/AndroidTvSampleInput/app/build/intermediates/exploded-aar/com.android.support/leanback-v17/24.0.0/res/values-ja/values-ja.xml",
+                    "position": {
+                        "startLine": 36,
+                        "startColumn": 4,
+                        "startOffset": 3514,
+                        "endColumn": 139,
+                        "endOffset": 3649
+                    }
+                }
+            },
+            {
+                "to": {
+                    "startLine": 57,
+                    "startColumn": 4,
+                    "startOffset": 5691,
+                    "endColumn": 77,
+                    "endOffset": 5764
+                },
+                "from": {
+                    "file": "/Users/liuale/Volumes/unix/AmazonSampleInput_Reference/AndroidTvSampleInput/app/build/intermediates/exploded-aar/com.android.support/leanback-v17/24.0.0/res/values-ja/values-ja.xml",
+                    "position": {
+                        "startLine": 37,
+                        "startColumn": 4,
+                        "startOffset": 3654,
+                        "endColumn": 77,
+                        "endOffset": 3727
+                    }
+                }
+            },
+            {
+                "to": {
+                    "startLine": 58,
+                    "startColumn": 4,
+                    "startOffset": 5769,
+                    "endColumn": 80,
+                    "endOffset": 5845
+                },
+                "from": {
+                    "file": "/Users/liuale/Volumes/unix/AmazonSampleInput_Reference/AndroidTvSampleInput/app/build/intermediates/exploded-aar/com.android.support/leanback-v17/24.0.0/res/values-ja/values-ja.xml",
+                    "position": {
+                        "startLine": 38,
+                        "startColumn": 4,
+                        "startOffset": 3732,
+                        "endColumn": 80,
+                        "endOffset": 3808
+                    }
+                }
+            },
+            {
+                "to": {
+                    "startLine": 59,
+                    "startColumn": 4,
+                    "startOffset": 5850,
+                    "endColumn": 100,
+                    "endOffset": 5946
+                },
+                "from": {
+                    "file": "/Users/liuale/Volumes/unix/AmazonSampleInput_Reference/AndroidTvSampleInput/app/build/intermediates/exploded-aar/com.android.support/appcompat-v7/24.0.0/res/values-ja/values-ja.xml",
+                    "position": {
+                        "startLine": 21,
+                        "startColumn": 4,
+                        "startOffset": 1895,
+                        "endColumn": 100,
+                        "endOffset": 1991
+                    }
+                }
+            }
+        ]
+    }
+]
