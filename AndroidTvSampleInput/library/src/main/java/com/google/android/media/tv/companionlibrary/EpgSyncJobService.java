@@ -38,7 +38,6 @@ import android.util.Log;
 import android.util.LongSparseArray;
 import android.util.SparseArray;
 
-import com.google.android.media.tv.companionlibrary.model.Advertisement;
 import com.google.android.media.tv.companionlibrary.model.Channel;
 import com.google.android.media.tv.companionlibrary.model.InternalProviderData;
 import com.google.android.media.tv.companionlibrary.model.Program;
@@ -380,26 +379,8 @@ public abstract class EpgSyncJobService extends JobService {
 
             List<Channel> tvChannels = getChannels();
 
-            /**
-             *  You only need to choose one of the following to push program meta data:
-             *  Option 1: updateChannelsWithTif()
-             *  Option 2: updateChannelsWithGraceNote()
-             *
-             *  And you only need to choose one of the following to launch Amazon Live Tv player
-             *  or use deep link to launch your own player
-             *
-             *  Option 1: updateChannelsWithTif()
-             *  Option 3: updateChannelsWithTifDeepLink()
-             */
-
-            //Option 1: Update the channels if the app uses Tif and integrate with Amazon Live TV player
+            // Insert/Update channels
             TvContractUtils.updateChannelsWithTif(mContext, mInputId, tvChannels);
-
-            //Option 2: Update the channels uses Gracenote
-            //TvContractUtils.updateChannelsWithGraceNote(mContext, mInputId);
-
-            //Option 3: Update the channels if the app uses Tif with DeepLink to launch customized player
-            TvContractUtils.updateChannelsWithTifDeepLink(mContext, mInputId, tvChannels.subList(0,2));
 
             LongSparseArray<Channel> channelMap = TvContractUtils.buildChannelMap(
                     mContext.getContentResolver(), mInputId);
@@ -408,40 +389,49 @@ public abstract class EpgSyncJobService extends JobService {
                 return null;
             }
 
+            // NOTE: If you are using external metadata for all channels, logic can stop here!
+            // You only need to insert programs if you are managing all metadata.
+
             // Default to one hour sync
             long durationMs = extras.getLong(
                     BUNDLE_KEY_SYNC_PERIOD, DEFAULT_IMMEDIATE_EPG_DURATION_MILLIS);
             long startMs = System.currentTimeMillis();
             long endMs = startMs + durationMs;
             for (int i = 0; i < channelMap.size(); ++i) {
-                Uri channelUri = TvContract.buildChannelUri(channelMap.keyAt(i));
-                if (isCancelled()) {
-                    broadcastError(ERROR_EPG_SYNC_CANCELED);
-                    return null;
-                }
-                List<Program> programs = getProgramsForChannel(channelUri, channelMap.valueAt(i),
-                        startMs, endMs);
-                if (DEBUG) {
-                    Log.d(TAG, programs.toString());
-                }
-                for (int index = 0; index < programs.size(); index++) {
-                    if (programs.get(index).getChannelId() == -1) {
-                        // Automatically set the channel id if not set
-                        programs.set(index,
-                                new Program.Builder(programs.get(index))
-                                        .setChannelId(channelMap.valueAt(i).getId())
-                                        .build());
+                if (channelMap.valueAt(i).getInternalProviderData() != null &&
+                        channelMap.valueAt(i).getInternalProviderData().getExternalIdValue() != null) {
+                    // Skip program insertion for channels with external metadata
+                } else {
+                    Uri channelUri = TvContract.buildChannelUri(channelMap.keyAt(i));
+                    if (isCancelled()) {
+                        broadcastError(ERROR_EPG_SYNC_CANCELED);
+                        return null;
                     }
+                    List<Program> programs = getProgramsForChannel(channelUri, channelMap.valueAt(i),
+                            startMs, endMs);
+                    if (DEBUG) {
+                        Log.d(TAG, programs.toString());
+                    }
+                    for (int index = 0; index < programs.size(); index++) {
+                        if (programs.get(index).getChannelId() == -1) {
+                            // Automatically set the channel id if not set
+                            programs.set(index,
+                                    new Program.Builder(programs.get(index))
+                                            .setChannelId(channelMap.valueAt(i).getId())
+                                            .build());
+                        }
+                    }
+
+                    // Double check if the job is cancelled, so that this task can be finished faster
+                    // after cancel() is called.
+                    if (isCancelled()) {
+                        broadcastError(ERROR_EPG_SYNC_CANCELED);
+                        return null;
+                    }
+                    updatePrograms(channelUri,
+                            getPrograms(channelMap.valueAt(i), programs, startMs, endMs));
                 }
 
-                // Double check if the job is cancelled, so that this task can be finished faster
-                // after cancel() is called.
-                if (isCancelled()) {
-                    broadcastError(ERROR_EPG_SYNC_CANCELED);
-                    return null;
-                }
-                updatePrograms(channelUri,
-                        getPrograms(channelMap.valueAt(i), programs, startMs, endMs));
                 Intent intent = new Intent(ACTION_SYNC_STATUS_CHANGED);
                 intent.putExtra(EpgSyncJobService.BUNDLE_KEY_INPUT_ID, mInputId);
                 intent.putExtra(EpgSyncJobService.BUNDLE_KEY_CHANNELS_SCANNED, i);
@@ -538,12 +528,10 @@ public abstract class EpgSyncJobService extends JobService {
                     programStartTimeMs = programEndTimeMs;
                     continue;
                 }
-                // Shift advertisement time to match current program time.
+
                 InternalProviderData updateInternalProviderData =
                         programInfo.getInternalProviderData();
-                shiftAdsTimeWithProgram(updateInternalProviderData,
-                        programInfo.getStartTimeUtcMillis(),
-                        programStartTimeMs);
+
                 programForGivenTime.add(new Program.Builder(programInfo)
                         .setChannelId(channel.getId())
                         .setStartTimeUtcMillis(programStartTimeMs)
@@ -555,30 +543,6 @@ public abstract class EpgSyncJobService extends JobService {
             }
 
             return programForGivenTime;
-        }
-
-        /**
-         * Shift advertisement time to match program playback time. For channels with repeated program,
-         * the time for current program may vary from what it was defined previously.
-         *
-         * @param oldProgramStartTimeMs Outdated program start time.
-         * @param newProgramStartTimeMs Updated program start time.
-         */
-        private void shiftAdsTimeWithProgram(InternalProviderData internalProviderData,
-                    long oldProgramStartTimeMs, long newProgramStartTimeMs) {
-            if (internalProviderData == null) {
-                return;
-            }
-            long timeShift = newProgramStartTimeMs - oldProgramStartTimeMs;
-            List<Advertisement> oldAds = internalProviderData.getAds();
-            List<Advertisement> newAds = new ArrayList<>();
-            for (Advertisement oldAd : oldAds) {
-                newAds.add(new Advertisement.Builder(oldAd)
-                        .setStartTimeUtcMillis(oldAd.getStartTimeUtcMillis() + timeShift)
-                        .setStopTimeUtcMillis(oldAd.getStopTimeUtcMillis() + timeShift)
-                        .build());
-            }
-            internalProviderData.setAds(newAds);
         }
 
         /**

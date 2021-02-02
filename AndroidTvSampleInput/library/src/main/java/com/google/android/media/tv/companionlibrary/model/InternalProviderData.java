@@ -41,16 +41,30 @@ public class InternalProviderData {
     private static final String TAG = "InternalProviderData";
     private static final boolean DEBUG = true;
 
+    /**
+     * Keys used by Fire TV to provide metadata from an external source.
+     * These keys should be set on a channel.
+     */
+    private static final String KEY_AMZN_EXTERNAL_ID_TYPE = "externalIdType";
+    private static final String KEY_AMZN_EXTERNAL_ID_VALUE = "externalIdValue";
+
+    /**
+     * Key used by Fire TV to enable deeplinking into your app for playback.
+     * This key should be set on a channel.
+     */
+    private static final String KEY_AMZN_PLAYBACK_DEEP_LINK_URI = "playbackDeepLinkUri";
+
+    /**
+     * Keys used by this sample app to support storage of program playback information.
+     * These keys are set on programs.
+     */
     private static final String KEY_VIDEO_TYPE = "type";
     private static final String KEY_VIDEO_URL = "url";
-    private static final String KEY_REPEATABLE = "repeatable";
+
+    /**
+     * Key used to support storage of arbitrary data.
+     */
     private static final String KEY_CUSTOM_DATA = "custom";
-    private static final String KEY_ADVERTISEMENTS = "advertisements";
-    private static final String KEY_ADVERTISEMENT_START = "start";
-    private static final String KEY_ADVERTISEMENT_STOP = "stop";
-    private static final String KEY_ADVERTISEMENT_TYPE = "type";
-    private static final String KEY_ADVERTISEMENT_REQUEST_URL = "requestUrl";
-    private static final String KEY_RECORDING_START_TIME = "recordingStartTime";
 
     private JSONObject mJsonObject;
 
@@ -162,6 +176,60 @@ public class InternalProviderData {
         return mJsonObject.toString();
     }
 
+
+    /**
+     * Sets the external ID type for the channel.
+     * This enables retrieval of metadata from an external source.
+     *
+     * @param externalIdType The external ID type, refer to integration documentation for valid values.
+     */
+    public void setExternalIdType(String externalIdType) {
+        try {
+            mJsonObject.put(KEY_AMZN_EXTERNAL_ID_TYPE, externalIdType);
+        } catch (JSONException ignored) {
+        }
+    }
+
+    /**
+     * Sets the external ID value for the channel. Both type and value must be set.
+     *
+     * @param externalIdValue The external ID value
+     */
+    public void setExternalIdValue(String externalIdValue) {
+        try {
+            mJsonObject.put(KEY_AMZN_EXTERNAL_ID_VALUE, externalIdValue);
+        } catch (JSONException ignored) {
+        }
+    }
+
+    /**
+     * Gets the external ID value for the channel.
+     *
+     * @return The external ID value
+     */
+    public String getExternalIdValue() {
+        if (mJsonObject.has(KEY_AMZN_EXTERNAL_ID_VALUE)) {
+            try {
+                return mJsonObject.getString(KEY_AMZN_EXTERNAL_ID_VALUE);
+            } catch (JSONException ignored) {
+            }
+        }
+        return null;
+    }
+
+    /**
+     * Sets the deeplink URI for the specific channel. Fire TV will fire this intent when the user
+     * wants to play a channel.
+     *
+     * @param playbackDeepLinkUri The uri to start playback of the specified channel.
+     */
+    public void setPlaybackDeepLinkUri(String playbackDeepLinkUri) {
+        try {
+            mJsonObject.put(KEY_AMZN_PLAYBACK_DEEP_LINK_URI, playbackDeepLinkUri);
+        } catch (JSONException ignored) {
+        }
+    }
+
     /**
      * Gets the video type of the program.
      *
@@ -207,50 +275,6 @@ public class InternalProviderData {
     }
 
     /**
-     * Gets a list of all advertisements. If no ads have been assigned, the list will be empty.
-     *
-     * @return A list of all advertisements for this channel or program.
-     */
-    public List<Advertisement> getAds() {
-        List<Advertisement> ads = new ArrayList<>();
-        try {
-            if (mJsonObject.has(KEY_ADVERTISEMENTS)) {
-                JSONArray adsJsonArray =
-                        new JSONArray(mJsonObject.get(KEY_ADVERTISEMENTS).toString());
-                for (int i = 0; i < adsJsonArray.length(); i++) {
-                    JSONObject ad = adsJsonArray.getJSONObject(i);
-                    long start = ad.getLong(KEY_ADVERTISEMENT_START);
-                    long stop = ad.getLong(KEY_ADVERTISEMENT_STOP);
-                    int type = ad.getInt(KEY_ADVERTISEMENT_TYPE);
-                    String requestUrl = ad.getString(KEY_ADVERTISEMENT_REQUEST_URL);
-                    ads.add(new Advertisement.Builder()
-                            .setStartTimeUtcMillis(start)
-                            .setStopTimeUtcMillis(stop)
-                            .setType(type)
-                            .setRequestUrl(requestUrl)
-                            .build());
-                }
-            }
-        } catch (JSONException ignored) {
-        }
-        return ads;
-    }
-
-    /**
-     * Gets recording start time of program for recorded program. For a non-recorded program, this
-     * value will not be set.
-     *
-     * @return Recording start of program in UTC milliseconds, 0 if no value is given.
-     */
-    public long getRecordedProgramStartTime() {
-        try {
-            return mJsonObject.getLong(KEY_RECORDING_START_TIME);
-        } catch (JSONException ignored) {
-        }
-        return 0;
-    }
-
-    /**
      * Sets the video url of the program.
      *
      * @param videoUrl A valid url pointing to the video to be played.
@@ -263,71 +287,8 @@ public class InternalProviderData {
     }
 
     /**
-     * Checks whether the programs on this channel should be repeated periodically in order.
-     *
-     * @return Whether to repeat programs. Returns false if no value has been set.
-     */
-    public boolean isRepeatable() {
-        if (mJsonObject.has(KEY_REPEATABLE)) {
-            try {
-                return mJsonObject.getBoolean(KEY_REPEATABLE);
-            } catch (JSONException ignored) {
-            }
-        }
-        return false;
-    }
-
-    /**
-     * Sets whether programs assigned to this channel should be repeated periodically.
-     * This field is relevant to channels.
-     *
-     * @param repeatable Whether to repeat programs.
-     */
-    public void setRepeatable(boolean repeatable) {
-        try {
-            mJsonObject.put(KEY_REPEATABLE, repeatable);
-        } catch (JSONException ignored) {
-        }
-    }
-
-    /**
-     * Sets a list of advertisements for this channel or program. If setting for a channel, list
-     * size should be <= 1. Channels cannot have more than one advertisement.
-     *
-     * @param ads A list of advertisements that should be shown.
-     */
-    public void setAds(List<Advertisement> ads) {
-        try {
-            if (ads != null && !ads.isEmpty()) {
-                JSONArray adsJsonArray = new JSONArray();
-                for (Advertisement ad : ads) {
-                    JSONObject adJson = new JSONObject();
-                    adJson.put(KEY_ADVERTISEMENT_START, ad.getStartTimeUtcMillis());
-                    adJson.put(KEY_ADVERTISEMENT_STOP, ad.getStopTimeUtcMillis());
-                    adJson.put(KEY_ADVERTISEMENT_TYPE, ad.getType());
-                    adJson.put(KEY_ADVERTISEMENT_REQUEST_URL, ad.getRequestUrl());
-                    adsJsonArray.put(adJson);
-                }
-                mJsonObject.put(KEY_ADVERTISEMENTS, adsJsonArray);
-            }
-        } catch (JSONException ignored) {
-        }
-    }
-
-    /**
-     * Sets the recording program start time for a recorded program.
-     *
-     * @param startTime Recording start time in UTC milliseconds of recorded program.
-     */
-    public void setRecordingStartTime(long startTime) {
-        try {
-            mJsonObject.put(KEY_RECORDING_START_TIME, startTime);
-        } catch (JSONException ignored) {
-        }
-    }
-
-    /**
      * Adds some custom data to the InternalProviderData.
+     * Developers are encouraged to use this blob to store arbitrary data.
      *
      * @param key The key for this data
      * @param value The value this data should take

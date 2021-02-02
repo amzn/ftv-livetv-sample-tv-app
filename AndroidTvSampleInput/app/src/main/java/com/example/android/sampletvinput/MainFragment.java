@@ -31,7 +31,7 @@ import com.example.android.sampletvinput.rich.RichTvInputSetupActivity;
  * This Fragment will be launched when click the Sample TV App tile in Home Page.
  *
  * If you want to launch the setup activity, please go to:
- * Settings -> Live TV -> Live TV Source -> Rich Input
+ * Settings -> Live TV -> Live TV Source -> Amazon Sample TV Input
  *
  * And {@link RichTvInputSetupActivity} will be launched. Please modify RichTvInputSetupActivity
  * if you want customize your setup activity page

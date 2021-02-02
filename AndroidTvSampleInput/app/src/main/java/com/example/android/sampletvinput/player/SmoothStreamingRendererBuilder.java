@@ -1,4 +1,4 @@
-/*
+ /*
  * Copyright (c) 2016 The Android Open Source Project
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -19,8 +19,6 @@ import android.content.Context;
 import android.media.AudioManager;
 import android.media.MediaCodec;
 import android.os.Handler;
-import android.util.Log;
-
 import com.google.android.exoplayer.DefaultLoadControl;
 import com.google.android.exoplayer.LoadControl;
 import com.google.android.exoplayer.MediaCodecAudioTrackRenderer;
@@ -47,7 +45,6 @@ import com.google.android.exoplayer.upstream.DefaultHttpDataSource;
 import com.google.android.exoplayer.upstream.DefaultUriDataSource;
 import com.google.android.exoplayer.util.ManifestFetcher;
 import com.google.android.exoplayer.util.Util;
-
 import java.io.IOException;
 
 /**
@@ -71,7 +68,7 @@ public class SmoothStreamingRendererBuilder implements DemoPlayer.RendererBuilde
     private AsyncRendererBuilder currentAsyncBuilder;
 
     public SmoothStreamingRendererBuilder(Context context, String userAgent, String url,
-            MediaDrmCallback drmCallback) {
+                                          MediaDrmCallback drmCallback) {
         this.context = context;
         this.userAgent = userAgent;
         this.url = Util.toLowerInvariant(url).endsWith("/manifest") ? url : url + "/Manifest";
@@ -105,7 +102,7 @@ public class SmoothStreamingRendererBuilder implements DemoPlayer.RendererBuilde
         private boolean canceled;
 
         public AsyncRendererBuilder(Context context, String userAgent, String url,
-                MediaDrmCallback drmCallback, DemoPlayer player) {
+                                    MediaDrmCallback drmCallback, DemoPlayer player) {
             this.context = context;
             this.userAgent = userAgent;
             this.drmCallback = drmCallback;
@@ -152,7 +149,7 @@ public class SmoothStreamingRendererBuilder implements DemoPlayer.RendererBuilde
                     return;
                 }
                 try {
-                    drmSessionManager = new StreamingDrmSessionManager(
+                    drmSessionManager =  StreamingDrmSessionManager.newFrameworkInstance(
                             manifest.protectionElement.uuid, player.getPlaybackLooper(),
                             drmCallback, null, player.getMainHandler(), player);
                 } catch (UnsupportedDrmException e) {

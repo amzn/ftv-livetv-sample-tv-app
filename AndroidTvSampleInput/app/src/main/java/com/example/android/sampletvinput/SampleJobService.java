@@ -15,6 +15,8 @@
  */
 package com.example.android.sampletvinput;
 
+import android.content.ComponentName;
+import android.content.Intent;
 import android.media.tv.TvContentRating;
 import android.media.tv.TvContract;
 import android.net.Uri;
@@ -22,12 +24,13 @@ import com.example.android.sampletvinput.rich.RichFeedUtil;
 import com.google.android.exoplayer.util.Util;
 import com.google.android.media.tv.companionlibrary.EpgSyncJobService;
 import com.google.android.media.tv.companionlibrary.XmlTvParser;
-import com.google.android.media.tv.companionlibrary.model.Advertisement;
 import com.google.android.media.tv.companionlibrary.model.Channel;
 import com.google.android.media.tv.companionlibrary.model.InternalProviderData;
 import com.google.android.media.tv.companionlibrary.model.Program;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 import static com.google.android.media.tv.companionlibrary.XmlTvParser.ANDROID_TV_RATING;
@@ -36,8 +39,12 @@ import static com.google.android.media.tv.companionlibrary.XmlTvParser.ANDROID_T
  * EpgSyncJobService that periodically runs to update channels and programs.
  */
 public class SampleJobService extends EpgSyncJobService {
+
+    /**
+     * Channel and Program data to be used for creating inline channel and program data
+     */
     private String MPEG_DASH_CHANNEL_NAME = "MPEG-Amz Player";
-    private String MPEG_DASH_CHANNEL_NUMBER = "3";
+    private String MPEG_DASH_CHANNEL_NUMBER = "4";
     private String MPEG_DASH_CHANNEL_LOGO
             = "https://storage.googleapis.com/android-tv/images/mpeg_dash.png";
     private String MPEG_DASH_PROGRAM_URL
@@ -51,89 +58,136 @@ public class SampleJobService extends EpgSyncJobService {
             = "https://storage.googleapis.com/wvmedia/clear/h264/tears/tears.mpd";
     private static final long TEARS_OF_STEEL_START_TIME_MS = 0;
     private static final long TEARS_OF_STEEL_DURATION_MS = 734 * 1000;
-    private static final long TEST_AD_1_START_TIME_MS = 15 * 1000;
-    private static final long TEST_AD_2_START_TIME_MS = 40 * 1000;
-    private static final long TEST_AD_DURATION_MS = 10 * 1000;
+
     /**
-     * Test <a href="http://www.iab.com/guidelines/digital-video-ad-serving-template-vast-3-0/">
-     * VAST</a> URL from <a href="https://www.google.com/dfp">DoubleClick for Publishers (DFP)</a>.
-     * More sample VAST tags can be found on
-     * <a href="https://developers.google.com/interactive-media-ads/docs/sdks/android/tags">DFP
-     * website</a>. You should replace it with the vast tag that you applied from your
-     * advertisement provider. To verify whether your video ad response is VAST compliant, try<a
-     * href="https://developers.google.com/interactive-media-ads/docs/sdks/android/vastinspector">
-     * Google Ads Mobile Video Suite Inspector</a>
+     * This constant is used for deeplink intents
+     * This is the primary constant that is used to get the Channel Information from the intent
+     * In here, the key-value pair in the intent is "channel_key" and channel's originalNetworkId
      */
-    private static String TEST_AD_REQUEST_URL =
-            "https://pubads.g.doubleclick.net/gampad/ads?sz=640x480&iu=/124319096/external/" +
-            "single_ad_samples&ciu_szs=300x250&impl=s&gdfp_req=1&env=vp&output=vast" +
-            "&unviewed_position_start=1&cust_params=deployment%3Ddevsite%26sample_ct" +
-            "%3Dlinear&correlator=";
+    public static final String CHANNEL_DEEP_LINK_INTENT_PRIM_KEY = "channel_deep_link_intent_prim_key";
+
+    /**
+     * This constant is used for deeplink intents
+     * This the secondary constant that is to get the Channel Input information from the intent
+     * In here, the key-value pair in the intent is "channel_key" and channel's inputId
+     */
+    public static final String CHANNEL_DEEP_LINK_INTENT_SEC_KEY = "channel_deep_link_intent_sec_key";
+
+    /**
+     * This constant represents the activity to start upon deeplinking
+     */
+    private static final String DEEP_LINK_ACTIVITY_CLASS_NAME = "com.example.android.sampletvinput.DemoPlayerActivity";
+
+
+    private static final String PACKAGE_NAME = "com.example.android.sampletvinput";
+    private static final String INPUT_ID = PACKAGE_NAME + "/.rich.RichTvInputService";
+
+    /**
+     * Gracenote is a provider of external metadata integrated with Fire TV. This is one valid type
+     * of external metadata. Refer to the Live TV integration docs for all valid values.
+     */
+    private final static String GRACENOTE_ID = "gracenote_ontv";
+
+    /**
+     * Denotes channels intended to be used for the deeplink integration.
+     */
+    private final static String DEEPLINK_SUFFIX = "-DeepLink";
+
 
 
     /**
-     * There is the sample to get channels, the provider is responsible to implement its own
-     * logic to get the channels with basic metadata
-     * @return
+     * This is a sample implementation of getChannels() which shows how to retrieve channels from an
+     * XML resource file and create programmatically inline.
+     *
+     * There are 8 channels retrieved here and then inserted into the TIF Database.
+     *
+     * Channels 1, 2 and 3 are retrieved from the resource XML file: rich_tv_input_xmltv_feed.xml
+     * Channels 4 - 8 are created programmatically in this method.
+     *
+     * Channels 1 and 2 are deeplink integrated meaning we insert a URI to launch this app
+     * to playback content in a custom player. This URI is invoked when a user selects the channel
+     * in the Fire TV UI.
+     *
+     * Channels 3 and 4 are integrated with the Fire TV Native Player meaning they will be played
+     * as part of the Fire TV UI - this uses the same mechanism used to implement preview playback.
+     *
+     * Channels 5 - 8 are integrated with external metadata meaning these channels receive all
+     * channel metadata and program lineup data directly through Fire TV services. This app is only
+     * responsible for inserting the external ID. Note: For this sample app, these channels do not
+     * invoke playback but simply serve as an example of leveraging external metadata.
+     * These could use either a deeplink integration OR the Fire TV Native Player for playback.
+     *
+     * @return list of channels to be inserted into the TIF database.
      */
     @Override
     public List<Channel> getChannels() {
         // Add channels through an XMLTV file
         XmlTvParser.TvListing listings = RichFeedUtil.getRichTvListings(this);
-        List<Channel> channelList = new ArrayList<>(listings.getChannels());
+        List<Channel> channelList = new ArrayList<>();
 
-        // Build advertisement list for the channel.
-        Advertisement channelAd = new Advertisement.Builder()
-                .setType(Advertisement.TYPE_VAST)
-                .setRequestUrl(TEST_AD_REQUEST_URL)
-                .build();
-        List<Advertisement> channelAdList = new ArrayList<>();
-        channelAdList.add(channelAd);
+        for (Channel channel : listings.getChannels()) {
+            // The first two channels in the XML feed are intended to be used with a deeplink integration
+            // See res/raw/rich_tv_input_xmltv_feed.xml for the channel and program data
+            if (channel.getDisplayName().endsWith(DEEPLINK_SUFFIX)) {
+
+                // Here is just an example that provider can also use deeplink to launch its own Player Activity
+                // Please make change accordingly if custom features are needed
+
+                Intent playbackDeepLinkIntent = new Intent();
+                playbackDeepLinkIntent.setComponent(new ComponentName(PACKAGE_NAME, DEEP_LINK_ACTIVITY_CLASS_NAME));
+                playbackDeepLinkIntent.putExtra(CHANNEL_DEEP_LINK_INTENT_PRIM_KEY, channel.getOriginalNetworkId());
+                playbackDeepLinkIntent.putExtra(CHANNEL_DEEP_LINK_INTENT_SEC_KEY, INPUT_ID);
+
+                InternalProviderData internalProviderDataPlaybackUri = new InternalProviderData();
+                internalProviderDataPlaybackUri.setPlaybackDeepLinkUri(playbackDeepLinkIntent.toUri(Intent.URI_INTENT_SCHEME));
+
+                channelList.add(new Channel.Builder(channel)
+                        .setInternalProviderData(internalProviderDataPlaybackUri)
+                        .build());
+            } else {
+                channelList.add(channel);
+            }
+        }
 
         // Add a channel programmatically
-        InternalProviderData internalProviderData = new InternalProviderData();
-        internalProviderData.setRepeatable(true);
-        internalProviderData.setAds(channelAdList);
         Channel channelTears = new Channel.Builder()
                 .setDisplayName(MPEG_DASH_CHANNEL_NAME)
                 .setDisplayNumber(MPEG_DASH_CHANNEL_NUMBER)
                 .setChannelLogo(MPEG_DASH_CHANNEL_LOGO)
                 .setOriginalNetworkId(MPEG_DASH_ORIGINAL_NETWORK_ID)
-                .setInternalProviderData(internalProviderData)
                 .build();
         channelList.add(channelTears);
+
+        // Add channels which will receive external metadata
+        List<String> externalGracenoteIds = Arrays.asList("10051", "10057", "10138", "58780");
+        int startChannelNum = 5;
+        for (String id : externalGracenoteIds) {
+            InternalProviderData internalProviderData = new InternalProviderData();
+            internalProviderData.setExternalIdType(GRACENOTE_ID);
+            internalProviderData.setExternalIdValue(id);
+
+            Channel externalMetadataChannel = new Channel.Builder()
+                    .setDisplayName("Channel " + id)
+                    .setDisplayNumber(Integer.toString(startChannelNum++))
+                    .setOriginalNetworkId(Integer.parseInt(id))
+                    .setInternalProviderData(internalProviderData)
+                    .build();
+
+            channelList.add(externalMetadataChannel);
+        }
+
         return channelList;
     }
 
     @Override
     public List<Program> getProgramsForChannel(Uri channelUri, Channel channel, long startMs,
             long endMs) {
-        if (!channel.getDisplayName().equals(MPEG_DASH_CHANNEL_NAME)) {
-            // Is an XMLTV Channel
-            XmlTvParser.TvListing listings = RichFeedUtil.getRichTvListings(getApplicationContext());
-            return listings.getPrograms(channel);
-        } else {
-            // Build Advertisement list for the program.
-            Advertisement programAd1 = new Advertisement.Builder()
-                    .setStartTimeUtcMillis(TEST_AD_1_START_TIME_MS)
-                    .setStopTimeUtcMillis(TEST_AD_1_START_TIME_MS + TEST_AD_DURATION_MS)
-                    .setType(Advertisement.TYPE_VAST)
-                    .setRequestUrl(TEST_AD_REQUEST_URL)
-                    .build();
-            Advertisement programAd2 = new Advertisement.Builder(programAd1)
-                    .setStartTimeUtcMillis(TEST_AD_2_START_TIME_MS)
-                    .setStopTimeUtcMillis(TEST_AD_2_START_TIME_MS + TEST_AD_DURATION_MS)
-                    .build();
-            List<Advertisement> programAdList = new ArrayList<>();
-            programAdList.add(programAd1);
-            programAdList.add(programAd2);
-
-            // Programatically add channel
+        if (channel.getDisplayName().equals(MPEG_DASH_CHANNEL_NAME)) {
+            // Programmatically add channel
             List<Program> programsTears = new ArrayList<>();
             InternalProviderData internalProviderData = new InternalProviderData();
             internalProviderData.setVideoType(Util.TYPE_DASH);
             internalProviderData.setVideoUrl(TEARS_OF_STEEL_SOURCE);
-            internalProviderData.setAds(programAdList);
 
             programsTears.add(new Program.Builder()
                     .setTitle(TEARS_OF_STEEL_TITLE)
@@ -149,6 +203,13 @@ public class SampleJobService extends EpgSyncJobService {
                     .build());
 
             return programsTears;
+        } else if (channel.getInternalProviderData() != null && channel.getInternalProviderData().getExternalIdValue() != null) {
+            // Has external metadata provided , no need to insert programs
+            return Collections.emptyList();
+        } else {
+            // Is an XMLTV Channel
+            XmlTvParser.TvListing listings = RichFeedUtil.getRichTvListings(getApplicationContext());
+            return listings.getPrograms(channel);
         }
     }
 }

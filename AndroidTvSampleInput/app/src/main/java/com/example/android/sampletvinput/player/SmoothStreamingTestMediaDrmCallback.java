@@ -19,6 +19,8 @@ import android.annotation.TargetApi;
 import android.media.MediaDrm.KeyRequest;
 import android.media.MediaDrm.ProvisionRequest;
 import android.text.TextUtils;
+
+import com.google.android.exoplayer.drm.ExoMediaDrm;
 import com.google.android.exoplayer.drm.MediaDrmCallback;
 import com.google.android.exoplayer.drm.StreamingDrmSessionManager;
 import com.google.android.exoplayer.util.Util;
@@ -49,18 +51,17 @@ public class SmoothStreamingTestMediaDrmCallback implements MediaDrmCallback {
     }
 
     @Override
-    public byte[] executeProvisionRequest(UUID uuid, ProvisionRequest request) throws IOException {
+    public byte[] executeProvisionRequest(UUID uuid, ExoMediaDrm.ProvisionRequest request) throws IOException {
         String url = request.getDefaultUrl() + "&signedRequest=" + new String(request.getData());
         return Util.executePost(url, null, null);
     }
 
     @Override
-    public byte[] executeKeyRequest(UUID uuid, KeyRequest request) throws Exception {
+    public byte[] executeKeyRequest(UUID uuid, ExoMediaDrm.KeyRequest request) throws Exception {
         String url = request.getDefaultUrl();
         if (TextUtils.isEmpty(url)) {
             url = PLAYREADY_TEST_DEFAULT_URI;
         }
         return Util.executePost(url, request.getData(), KEY_REQUEST_PROPERTIES);
     }
-
 }

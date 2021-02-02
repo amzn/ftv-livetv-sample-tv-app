@@ -5,14 +5,14 @@ xmltv.dtd are extended to be align with Android TV Input Framework and contain s
 contents. For details, please see the documentation of XmlTvParser class.
 -->
 <tv>
-    <channel id="com.example.android.sampletvinput.2-1" repeat-programs="true">
+    <channel id="com.example.android.sampletvinput.1" repeat-programs="true">
         <display-name>Google-DeepLink</display-name>
-        <display-number>2-1</display-number>
+        <display-number>1</display-number>
         <icon src="https://storage.googleapis.com/android-tv/images/google.png"/>
     </channel>
-    <channel id="com.example.android.sampletvinput.2-2" repeat-programs="true">
+    <channel id="com.example.android.sampletvinput.2" repeat-programs="true">
         <display-name>Creative-DeepLink</display-name>
-        <display-number>2-2</display-number>
+        <display-number>2</display-number>
         <icon src="https://storage.googleapis.com/android-tv/images/cc.png"/>
         <app-link color="#4caf50"
                   intent-uri="intent:#Intent;component=com.example.android.sampletvinput/.rich.RichAppLinkDetailsActivity;S.display-number=2-4;end"
@@ -20,14 +20,10 @@ contents. For details, please see the documentation of XmlTvParser class.
                   text="App Link Text 2">
             <icon src="https://storage.googleapis.com/android-tv/images/mpeg_dash.png"/>
         </app-link>
-        <advertisement
-            type="VAST">
-            <request-url><![CDATA[https://pubads.g.doubleclick.net/gampad/ads?sz=640x480&iu=/124319096/external/single_ad_samples&ciu_szs=300x250&impl=s&gdfp_req=1&env=vp&output=vast&unviewed_position_start=1&cust_params=deployment%3Ddevsite%26sample_ct%3Dlinear&correlator=]]></request-url>
-        </advertisement>
     </channel>
-    <channel id="com.example.android.sampletvinput.2-3" repeat-programs="true">
+    <channel id="com.example.android.sampletvinput.3" repeat-programs="true">
         <display-name>HLS-Amz Player</display-name>
-        <display-number>2-3</display-number>
+        <display-number>3</display-number>
         <icon src="http://storage.googleapis.com/android-tv/images/hls.png"/>
         <app-link color="#4caf50"
             intent-uri="intent:#Intent;component=com.example.android.sampletvinput/.rich.RichAppLinkSidePanelActivity;S.display-number=2-3;end"
@@ -37,7 +33,7 @@ contents. For details, please see the documentation of XmlTvParser class.
         </app-link>
     </channel>
     <programme
-        channel="com.example.android.sampletvinput.2-1"
+        channel="com.example.android.sampletvinput.1"
         start="20150817000000 +0000"
         stop="20150817000147 +0000"
         thumbnail-uri="http://ecx.images-amazon.com/images/I/61DXPTMlggL.png"
@@ -53,7 +49,7 @@ contents. For details, please see the documentation of XmlTvParser class.
         </rating>
     </programme>
     <programme
-        channel="com.example.android.sampletvinput.2-1"
+        channel="com.example.android.sampletvinput.1"
         start="20150817000147 +0000"
         stop="20150817004502 +0000"
         thumbnail-uri="http://ecx.images-amazon.com/images/I/61DXPTMlggL.png"
@@ -70,7 +66,7 @@ contents. For details, please see the documentation of XmlTvParser class.
         </rating>
     </programme>
     <programme
-        channel="com.example.android.sampletvinput.2-1"
+        channel="com.example.android.sampletvinput.1"
         start="20150817004502 +0000"
         stop="20150817005902 +0000"
         thumbnail-uri="http://ecx.images-amazon.com/images/I/61DXPTMlggL.png"
@@ -87,7 +83,7 @@ contents. For details, please see the documentation of XmlTvParser class.
         </rating>
     </programme>
     <programme
-        channel="com.example.android.sampletvinput.2-1"
+        channel="com.example.android.sampletvinput.1"
         start="20150817005902 +0000"
         stop="20150817010113 +0000"
         thumbnail-uri="http://ecx.images-amazon.com/images/I/61DXPTMlggL.png"
@@ -103,7 +99,7 @@ contents. For details, please see the documentation of XmlTvParser class.
         </rating>
     </programme>
     <programme
-        channel="com.example.android.sampletvinput.2-1"
+        channel="com.example.android.sampletvinput.1"
         start="20150817010113 +0000"
         stop="20150817010315 +0000"
         thumbnail-uri="http://ecx.images-amazon.com/images/I/61DXPTMlggL.png"
@@ -122,7 +118,7 @@ contents. For details, please see the documentation of XmlTvParser class.
         </rating>
     </programme>
     <programme
-        channel="com.example.android.sampletvinput.2-2"
+        channel="com.example.android.sampletvinput.2"
         start="20150817000000 +0000"
         stop="20150817001053 +0000"
         thumbnail-uri="http://ecx.images-amazon.com/images/I/61UEYyyAB5L.png"
@@ -139,7 +135,7 @@ contents. For details, please see the documentation of XmlTvParser class.
         </rating>
     </programme>
     <programme
-        channel="com.example.android.sampletvinput.2-2"
+        channel="com.example.android.sampletvinput.2"
         start="20150817001053 +0000"
         stop="20150817002540 +0000"
         thumbnail-uri="http://ecx.images-amazon.com/images/I/61UEYyyAB5L.png"
@@ -156,7 +152,7 @@ contents. For details, please see the documentation of XmlTvParser class.
         </rating>
     </programme>
     <programme
-        channel="com.example.android.sampletvinput.2-3"
+        channel="com.example.android.sampletvinput.3"
         start="20150817000000 +0000"
         stop="20150817003020 +0000"
         thumbnail-uri="http://ecx.images-amazon.com/images/I/61BDNGOl8-L.png"
