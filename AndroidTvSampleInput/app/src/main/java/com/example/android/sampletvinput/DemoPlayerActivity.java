@@ -15,11 +15,11 @@ import com.google.android.media.tv.companionlibrary.utils.TvContractUtils;
 
 
 /**
- * This is the Sample Activity that demo the usage of DeepLink. Referring to the
- * "Option 3" in the EpgSyncJobService.java. You should implement your own player here
+ * This activity handles the deeplink URI to playback content within this app.
+ * You should implement your own in-app player here
  *
- * This activity is just used to demo 3p can received the tif_id and other information from
- * the intent
+ * This activity is just used to demo how your app can receive the TIF ID and other
+ * information from the intent.
  *
  */
 public class DemoPlayerActivity extends Activity {

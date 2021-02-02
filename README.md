@@ -1,48 +1,77 @@
 ## Overview
-This Sample TV App is based on the google sample tv app: https://github.com/googlearchive/androidtv-Leanback
-You can use this app as a reference to do the Live TV integration on Fire-TV for Live Content. 
+Here you will find a sample implementation of integrating live linear content provided by your app with Amazon Fire TV. Find the full docs on Amazon's developer portal - https://developer.amazon.com/docs/fire-tv/live-tv-integration.html.
+
+This Sample TV App builds upon [Google's Sample TV input](https://github.com/googlesamples/androidtv-sample-inputs).
 
 ## Live TV integration on Fire-TV
 If your application provides live content, you can surface it in the Fire TV's Channel Guide and the "On Now" row on Fire TV's home screen as well as make it searchable. The process for integrating live content into the Fire TV browse and search experience follows the same steps as outlined in the standard Android documentation. You need to create a TvInputService and provide channel information for Fire TV to consume. Optionally, you can implement a few shortcuts and alternative options in your app. For example, you can rely on Amazon services to surface programming metadata, and playback can be handled within your application and launched through deeplinks instead of being embedded within the Live TV player native to all Fire TV devices.
 
 ## Fire TV supports the following Live TV features:
-1. Linear content tiles in launcher “On Now” and Recents rows displaying the current programming information
-2. Channel guide with 14 days of programming for each channel
-3. Search for station and programming information for next 14 days
-4. Alexa support for “Tune to [channel_name]”
-5. Ability to favorite channels from browse and search experiences
-6. Option to provide deep link to playback
+- Linear channel tiles appear in Fire TV home and live tab for customers entitled to your content
+- Channels appear in Fire TV's channel guide woth 14 days of programming
+- Playback integrated in Fire TV UI
+- Channel tiles can deeplink directly into your app
+- Search for station and programming information for next 14 days
+- Alexa support for utterances such as “Tune to [channel_name]” and "Tune to channel [channel_number]"
+- Ability to favorite channels from browse and search experiences
+- Option to provide deep link to playback
 
-## Program Fields that FireTV currently support
-Currently in FireTV UI, those program fields are supported in program.java if developer chooses to use the tv.db(tif) as the only source for program metadata:
-1. title: the title for the program
-2. startTimeUtcMillis: the start time of the program, in format of millisecond in UTC time
-3. endTimeUtcMillis: the end time of the program, in format of millisecond in UTC time
-4. contentRating: the standard tv content rating. Ex: TV-PG
-5. episodeTitle: the title of the specific episode of the playing program
-6. shortDesciption: the short description of the program
-7. longDescription: the long description of the program. If this field is provided, it will override the "shortDescription" above.
+**Note:** to see these features in action, clone this repository then build with Android Studio and install the app on your Fire TV device.
 
-For the details: refer to "XmlTvParser.parseProgram()"
+## Implementation Flow
 
-## References and Developer Guides
-Refer to the "EpgSyncJobService.java" in Sample TV App, it demos two way of launching player activity:
+![TIF Diagram](tif-diagram.png "TIF Implementation Flow")
 
-- TvContractUtils.updateChannelsWithTif()
-- TvContractUtils.updateChannelsWithTifDeepLink()
+## Quick Links
+- [RichTvInputService](app/src/main/java/com/example/android/sampletvinput/rich/RichTvInputService.java) - Implementation of Android TV TvInputService. This builds on the base class [BaseTvInputService](BaseTvInputService.java). This includes the integration with [playback](app/src/main/java/com/example/android/sampletvinput/rich/RichTvInputService.java#L228) in the Fire TV UI.
+- [EpgJobSyncService](library/src/main/java/com/google/android/media/tv/companionlibrary/EpgSyncJobService.java) - This is an abstract class with the majority of an implementation of Android's JobService to be used with the Job Scheduler. Abstract methods GetChannels() and GetProgramsForChannel() are implemented in the [SampleJobService](app/src/main/java/com/example/android/sampletvinput/SampleJobService.java). This holds the core logic of maintaining up to date channel and program metadata in the TIF database.
+- [TvContractUtils](library/src/main/java/com/google/android/media/tv/companionlibrary/utils/TvContractUtils.java) - Utility class demonstrating insertion and retrieval of program and channel data in the Tv Input Framework (TIF) database.
+- [DemoPlayer](app/src/main/java/com/example/android/sampletvinput/player/DemoPlayer.java) - Example of integration with ExoPlayer to support playback in Fire TV UI (in coordination with the RichTvInputService) as well as in app playback.
+- [DemoPlayerActivity](app/src/main/java/com/example/android/sampletvinput/DemoPlayerActivity.java) - Example of handling the deeplink intent URI to support playback in-app when requested by the user from the Fire TV UI.
 
-By using the first option, it will use the Amazon Live TV player. Playback of Live TV content is typically handled by the native live TV application on the device by interacting with your TvInputService.Session, no extra work is required to create your own player activity UI.  
+## Fire TV Metadata Fields
+### Channel Fields currently supported by Fire TV
+These are the fields supported by Fire TV UI for channel metadata.
+- `displayName` - The display name for the channel
+- `displayNumber` - Optional field to display a number for the channel. This field supports the Alexa tune to channel number feature
+- `inputId` - The Input ID of your TvInputService
+- `browsable` - Boolean value to determine if the channel should be browseable
+-  `searchable` - Boolean value to determine if the channel should appear in search results
+- `internalProviderData` - This field supports a JSON blob with specific keys used by Fire TV
+    - `playbackDeepLinkUri` - Field to support a URI to invoke when a customer selects the channel from Fire TV's UI
+    - `externalIdType` - Specifies the external metadata service type to provide channel and program metadata through Fire TV services. Talk to your Amazon contact to learn more
+    - `externalIdValue` - The ID value for the external metadata provider
 
-By using the second option, you need to create your own Player Activity and the UI. And you need to find your own way to pass the channel information through the deeplink intent.
-"DemoPlayerActivity.java" is a sample to demo this case, and it is still required to implement a TvInputService.Session even if deeplink intents are provided, so that you can get the video in the "preview" screen in FireTV UI. 
+### Program Fields currently supported by Fire TV
+These are the fields currently supported in the Fire TV UI for Program objects if you are not using any external metadata source.
+- `title` - the title for the program
+- `startTimeUtcMillis` - the start time of the program, in format of millisecond in UTC time
+- `endTimeUtcMillis` - the end time of the program, in format of millisecond in UTC time
+- `contentRating` - the standard tv content rating. Ex: TV-PG
+- `episodeTitle` - the title of the specific episode of the playing program
+- `shortDesciption` - the short description of the program
+- `longDescription` - the long description of the program. If this field is provided, it will override the "shortDescription" above.
+- `thumbnailUri` - Small image for the program
+- `posterArtUri` - Poster art image for the program
 
-For other details, please refer to: https://developer.amazon.com/docs/fire-tv/live-tv-integration.html
+### Note on Program and Channel Models
+
+This repository contains implementations of the Program object which represents data pushed to the TIF programs table as well as the Channel object which represents data pushed to the TIF channels table. Additionally the repository implements an InternalProviderData object to represent data stored in the InternalProviderData column on the programs and channels tables.
+
+You may utilize these implementations within your own app or use Android library implementations. Android provides these models in two places:
+
+`com.google.android.libraries.tv:companionlibrary:0.4.1`
+and the AndroidX library
+`androidx.tvprovider:tvprovider:1.0.0`. The models in these libaries are equivalent to the implementations in this repository with the exception of accepting the InternalProviderData object. Instead those models will take the serialized blob instead.
+
+## Questions, Support, and Feedback
+If you have further questions, support or feedback needs please reach out to your Amazon contact who will be able to further assist you. If you have general feedback for the code examples here, feel free to raise a GitHub issue in this repository.
 
 ## License
 License under the Apache 2.0 license. See the LICENSE file for details.
 
 ## Version
-Version 1.0 
+Version 1.0
 
 ## Notice
 Images/videos used in this sample are courtesy of the Blender

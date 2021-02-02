@@ -13,15 +13,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package com.example.android.sampletvinput.player;
 
 import android.content.Context;
 import android.media.AudioManager;
 import android.media.MediaCodec;
 import android.os.Handler;
-import android.util.Log;
-
 import com.google.android.exoplayer.DefaultLoadControl;
 import com.google.android.exoplayer.LoadControl;
 import com.google.android.exoplayer.MediaCodecAudioTrackRenderer;
@@ -47,7 +44,6 @@ import com.google.android.exoplayer.upstream.DefaultBandwidthMeter;
 import com.google.android.exoplayer.upstream.DefaultUriDataSource;
 import com.google.android.exoplayer.util.ManifestFetcher;
 import com.google.android.exoplayer.util.ManifestFetcher.ManifestCallback;
-
 import java.io.IOException;
 import java.util.List;
 
@@ -92,17 +88,15 @@ public class HlsRendererBuilder implements DemoPlayer.RendererBuilder {
 
         private final Context context;
         private final String userAgent;
-        private final String url;
         private final DemoPlayer player;
         private final ManifestFetcher<HlsPlaylist> playlistFetcher;
 
         private boolean canceled;
 
         public AsyncRendererBuilder(Context context, String userAgent, String url,
-                DemoPlayer player) {
+                                    DemoPlayer player) {
             this.context = context;
             this.userAgent = userAgent;
-            this.url = url;
             this.player = player;
             HlsPlaylistParser parser = new HlsPlaylistParser();
             playlistFetcher = new ManifestFetcher<>(url,
@@ -141,9 +135,9 @@ public class HlsRendererBuilder implements DemoPlayer.RendererBuilder {
 
             // Build the video/audio/metadata renderers.
             DataSource dataSource = new DefaultUriDataSource(context, bandwidthMeter, userAgent);
-            HlsChunkSource chunkSource = new HlsChunkSource(true /* isMaster */, dataSource, url,
+            HlsChunkSource chunkSource = new HlsChunkSource(true /* isMaster */, dataSource,
                     manifest, DefaultHlsTrackSelector.newDefaultInstance(context), bandwidthMeter,
-                    timestampAdjusterProvider, HlsChunkSource.ADAPTIVE_MODE_SPLICE);
+                    timestampAdjusterProvider);
             HlsSampleSource sampleSource = new HlsSampleSource(chunkSource,
                     loadControl,
                     MAIN_BUFFER_SEGMENTS * BUFFER_SEGMENT_SIZE,
@@ -170,9 +164,9 @@ public class HlsRendererBuilder implements DemoPlayer.RendererBuilder {
                         new DefaultUriDataSource(context, bandwidthMeter, userAgent);
                 HlsChunkSource textChunkSource =
                         new HlsChunkSource(false /* isMaster */, textDataSource,
-                                url, manifest, DefaultHlsTrackSelector.newVttInstance(),
+                                manifest, DefaultHlsTrackSelector.newSubtitleInstance(),
                                 bandwidthMeter,
-                                timestampAdjusterProvider, HlsChunkSource.ADAPTIVE_MODE_SPLICE);
+                                timestampAdjusterProvider);
                 HlsSampleSource textSampleSource = new HlsSampleSource(textChunkSource, loadControl,
                         TEXT_BUFFER_SEGMENTS * BUFFER_SEGMENT_SIZE, mainHandler, player,
                         DemoPlayer.TYPE_TEXT);

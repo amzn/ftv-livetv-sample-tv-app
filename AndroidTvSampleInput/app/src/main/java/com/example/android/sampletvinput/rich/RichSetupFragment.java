@@ -94,7 +94,6 @@ public class RichSetupFragment extends ChannelSetupFragment {
         } else {
             getActivity().setResult(Activity.RESULT_CANCELED);
         }
-        getActivity().finish();
     }
 
     @Override

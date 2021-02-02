@@ -47,11 +47,8 @@ import com.google.android.exoplayer.text.SubtitleLayout;
 import com.google.android.media.tv.companionlibrary.BaseTvInputService;
 import com.google.android.media.tv.companionlibrary.EpgSyncJobService;
 import com.google.android.media.tv.companionlibrary.TvPlayer;
-import com.google.android.media.tv.companionlibrary.model.Advertisement;
 import com.google.android.media.tv.companionlibrary.model.Channel;
 import com.google.android.media.tv.companionlibrary.model.Program;
-import com.google.android.media.tv.companionlibrary.model.RecordedProgram;
-import com.google.android.media.tv.companionlibrary.utils.TvContractUtils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -101,13 +98,10 @@ public class RichTvInputService extends BaseTvInputService {
         return super.sessionCreated(session);
     }
 
-    @RequiresApi(api = Build.VERSION_CODES.N)
-    @Nullable
-    @Override
-    public TvInputService.RecordingSession onCreateRecordingSession(String inputId) {
-        return new RichRecordingSession(this, inputId);
-    }
-
+    /**
+     * The session implementation handles playback in Fire TV UI. This supports both preview playback
+     * as well as full playback in the native Fire TV player. 
+     */
     class RichTvInputSessionImpl extends BaseTvInputService.Session implements
             DemoPlayer.Listener, DemoPlayer.CaptionListener {
         private static final float CAPTION_LINE_HEIGHT_RATIO = 0.0533f;
@@ -194,6 +188,11 @@ public class RichTvInputService extends BaseTvInputService {
             return tracks;
         }
 
+        /**
+         * PLAYBACK-FTVUI 7: onPlayProgram()
+         * This method checks for a valid program and then creates the DemoPlayer object and flags
+         * it to play when ready
+         */
         @Override
         public boolean onPlayProgram(Program program, long startPosMs) {
             if (program == null) {
@@ -201,6 +200,7 @@ public class RichTvInputService extends BaseTvInputService {
                 notifyVideoUnavailable(TvInputManager.VIDEO_UNAVAILABLE_REASON_TUNING);
                 return false;
             }
+            // The feed for the program is stored in its internalProviderData column
             createPlayer(program.getInternalProviderData().getVideoType(),
                     Uri.parse(program.getInternalProviderData().getVideoUrl()));
             if (startPosMs > 0) {
@@ -213,32 +213,33 @@ public class RichTvInputService extends BaseTvInputService {
             return true;
         }
 
-        @RequiresApi(api = Build.VERSION_CODES.N)
-        public boolean onPlayRecordedProgram(RecordedProgram recordedProgram) {
-            //No-op
-            return false;
-        }
-
         public TvPlayer getTvPlayer() {
             return mPlayer;
         }
 
+        /**
+         * onTune is the initial call made by Fire TV into the app when the user triggers 
+         * playback in the Fire TV UI. Follow these comments tagged with "PLAYBACK-FTVUI" to trace the full
+         * flow of playback as implemented in this sample app.
+         * 
+         * PLAYBACK-FTVUI 1: onTune
+         */
         @Override
         public boolean onTune(Uri channelUri) {
             if (DEBUG) {
                 Log.d(TAG, "Tune to " + channelUri.toString());
             }
+            // This notification tells Fire TV that we are currently tuning to the requested channel
             notifyVideoUnavailable(TvInputManager.VIDEO_UNAVAILABLE_REASON_TUNING);
+            // When tuning we always release any prior playback state
             releasePlayer();
             return super.onTune(channelUri);
         }
 
-        @Override
-        public void onPlayAdvertisement(Advertisement advertisement) {
-            createPlayer(TvContractUtils.SOURCE_TYPE_HTTP_PROGRESSIVE,
-                    Uri.parse(advertisement.getRequestUrl()));
-        }
-
+        /**
+         * PLAYBACK-FTVUI 8: createPlayer()
+         * Creates the player with the specific video url for the program.
+         */
         private void createPlayer(int videoType, Uri videoUrl) {
             releasePlayer();
             mPlayer = new DemoPlayer(RendererBuilderFactory.createRendererBuilder(
@@ -314,6 +315,10 @@ public class RichTvInputService extends BaseTvInputService {
                     CAPTION_LINE_HEIGHT_RATIO * Math.min(displaySize.x, displaySize.y));
         }
 
+        /**
+         * PLAYBACK-FTVUI 9: onStateChanged()
+         * Triggered by the DemoPlayer once playback begins. Invokes critical notifications back to Fire TV UI to complete the flow.
+         */
         @Override
         public void onStateChanged(boolean playWhenReady, int playbackState) {
             if (mPlayer == null) {
@@ -332,7 +337,10 @@ public class RichTvInputService extends BaseTvInputService {
                 notifyTrackSelected(TvTrackInfo.TYPE_AUDIO, audioId);
                 notifyTrackSelected(TvTrackInfo.TYPE_VIDEO, videoId);
                 notifyTrackSelected(TvTrackInfo.TYPE_SUBTITLE, textId);
+                // These notifications alert the Fire TV UI that the player is ready to playback
+                // These two calls must fire only once the player is fully ready to play
                 notifyVideoAvailable();
+                notifyContentAllowed();
             } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M &&
                     Math.abs(mPlayer.getPlaybackSpeed() - 1) < 0.1 &&
                     playWhenReady && playbackState == ExoPlayer.STATE_BUFFERING) {
@@ -365,45 +373,6 @@ public class RichTvInputService extends BaseTvInputService {
                     onTune(channelUri);
                 }
             }, EPG_SYNC_DELAYED_PERIOD_MS);
-        }
-    }
-
-    /**
-     * Currently Amazon doesn't support cloud recording program for 3P App
-     */
-    @RequiresApi(api = Build.VERSION_CODES.N)
-    private class RichRecordingSession extends BaseTvInputService.RecordingSession {
-        private static final String TAG = "RecordingSession";
-        private String mInputId;
-
-        public RichRecordingSession(Context context, String inputId) {
-            super(context, inputId);
-            mInputId = inputId;
-        }
-
-        @Override
-        public void onTune(Uri uri) {
-            //No-op
-        }
-
-        @Override
-        public void onStartRecording(final Uri uri) {
-            //No-op
-        }
-
-        @Override
-        public void onStopRecording(Program programToRecord) {
-            //No-op
-        }
-
-        @Override
-        public void onStopRecordingChannel(Channel channelToRecord) {
-            //No-op
-        }
-
-        @Override
-        public void onRelease() {
-            //No-op
         }
     }
 }
