@@ -59,6 +59,7 @@ public final class Channel {
     private String mNetworkAffiliation;
     private int mSearchable;
     private String mServiceType;
+    private TifExtension mTifExtension;
 
     private Channel() {
         mId = INVALID_CHANNEL_ID;
@@ -192,6 +193,11 @@ public final class Channel {
     public String getNetworkAffiliation() {
         return mNetworkAffiliation;
     }
+
+    /**
+     * @return An instance of {@Link TIFExtension} for the channel
+     */
+    public TifExtension getTifExtension() { return mTifExtension; }
 
     /**
      * @return The value of {@link TvContract.Channels#COLUMN_SEARCHABLE} for the channel.
@@ -358,6 +364,7 @@ public final class Channel {
         mNetworkAffiliation = other.mNetworkAffiliation;
         mSearchable = other.mSearchable;
         mServiceType = other.mServiceType;
+        mTifExtension = other.mTifExtension;
     }
 
     /**
@@ -768,6 +775,17 @@ public final class Channel {
          */
         public Builder setServiceType(String serviceType) {
             mChannel.mServiceType = serviceType;
+            return this;
+        }
+
+        /**
+         * Sets TifExtension instance for the Channel.
+         *
+         * @param mTifExtension The instance of TifExtension for the channel.
+         * @return This Builder object to allow for chaining of calls to builder methods.
+         */
+        public Builder setTifExtension(TifExtension mTifExtension) {
+            mChannel.mTifExtension = mTifExtension;
             return this;
         }
 

@@ -16,8 +16,8 @@
 
 package com.google.android.media.tv.companionlibrary.utils;
 
-import android.content.ContentProviderOperation;
 import android.content.ContentResolver;
+import android.content.ContentUris;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.SharedPreferences;
@@ -32,7 +32,6 @@ import android.text.TextUtils;
 import android.util.Log;
 import android.util.LongSparseArray;
 import android.util.SparseArray;
-
 import com.google.android.media.tv.companionlibrary.BaseTvInputService;
 import com.google.android.media.tv.companionlibrary.model.Channel;
 import com.google.android.media.tv.companionlibrary.model.Program;
@@ -70,7 +69,7 @@ public class TvContractUtils {
     public static final String INPUT_ID = "com.example.android.sampletvinput/.rich.RichTvInputService";
 
     private static final String TAG = "TvContractUtils";
-    private static final boolean DEBUG = false;
+    private static final boolean DEBUG = true;
     private static final SparseArray<String> VIDEO_HEIGHT_TO_FORMAT_MAP = new SparseArray<>();
 
     /**
@@ -130,6 +129,7 @@ public class TvContractUtils {
 
         // If a channel exists, update it. If not, insert a new one.
         Map<Uri, String> logos = new HashMap<>();
+        List<TifExtensionChannel> tifExtensionChannels = new ArrayList<>();
         for (Channel channel : channels) {
             ContentValues values = new ContentValues();
             values.put(Channels.COLUMN_INPUT_ID, inputId);
@@ -167,9 +167,19 @@ public class TvContractUtils {
             if (channel.getChannelLogo() != null && !TextUtils.isEmpty(channel.getChannelLogo())) {
                 logos.put(TvContract.buildChannelLogoUri(uri), channel.getChannelLogo());
             }
+            if (channel.getTifExtension() != null) {
+                tifExtensionChannels.add(new TifExtensionChannel.Builder()
+                        .setChannelId(ContentUris.parseId(uri))
+                        .setInputId(channel.getInputId() == null ? inputId : channel.getInputId())
+                        .setTifExtension(channel.getTifExtension())
+                        .build());
+            }
         }
         if (!logos.isEmpty()) {
             new InsertLogosTask(context).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, logos);
+        }
+        if (!tifExtensionChannels.isEmpty()) {
+            bulkInsertTIFExtensionChannels(resolver, tifExtensionChannels);
         }
 
         // Deletes channels which don't exist in the new feed.
@@ -188,6 +198,46 @@ public class TvContractUtils {
     }
 
     /**
+     * Bulk inserts channels in TifExtension.
+     *
+     * @param resolver Application's ContentResolver.
+     * @param tifExtensionChannels The List of channels to be inserted in TifExtension.
+     */
+    private static void bulkInsertTIFExtensionChannels(ContentResolver resolver,
+                                                       List<TifExtensionChannel> tifExtensionChannels) {
+        List<ContentValues> extensionValuesList = new ArrayList<>();
+
+        Log.d(TAG, "Received " + tifExtensionChannels.size() + " channels to be added");
+        for (TifExtensionChannel tifExtensionChannel : tifExtensionChannels) {
+            ContentValues extensionValues = new ContentValues();
+
+            extensionValues.put(TifExtensionContract.Channels.COLUMN_CHANNEL_ID,
+                    tifExtensionChannel.getChannelId());
+
+            extensionValues.put(TifExtensionContract.Channels.COLUMN_INPUT_ID,
+                    tifExtensionChannel.getInputId());
+            if (tifExtensionChannel.getTifExtension().getGenre() != null) {
+                extensionValues.put(TifExtensionContract.Channels.COLUMN_GENRE,
+                        tifExtensionChannel.getTifExtension().getGenre());
+                Log.d(TAG, "For ChannelId: " + tifExtensionChannel.getChannelId() +
+                        " genre set to " + tifExtensionChannel.getTifExtension().getGenre());
+            }
+            extensionValuesList.add(extensionValues);
+        }
+
+        try {
+            // Insert or CONFLICT_REPLACE channels into TifExtension
+            ContentValues[] insertBulk = extensionValuesList.toArray(
+                    new ContentValues[extensionValuesList.size()]);
+            int rowsCreated =  resolver.bulkInsert(TifExtensionContract.Channels.CONTENT_URI,
+                    insertBulk);
+            Log.d(TAG, "Successfully added " + rowsCreated + " in TifExtension");
+        } catch (Exception e) {
+            Log.d(TAG, "Exception in bulk inserting channels " + e);
+        }
+    }
+
+    /**
      * Builds a map of available channels.
      *
      * @param resolver Application's ContentResolver.
@@ -197,7 +247,7 @@ public class TvContractUtils {
      * @hide
      */
     public static LongSparseArray<Channel> buildChannelMap(@NonNull ContentResolver resolver,
-            @NonNull String inputId) {
+                                                           @NonNull String inputId) {
         Uri uri = TvContract.buildChannelsUriForInput(inputId);
         LongSparseArray<Channel> channelMap = new LongSparseArray<>();
         Cursor cursor = null;
