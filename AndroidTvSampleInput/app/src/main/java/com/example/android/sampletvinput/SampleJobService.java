@@ -27,6 +27,7 @@ import com.google.android.media.tv.companionlibrary.XmlTvParser;
 import com.google.android.media.tv.companionlibrary.model.Channel;
 import com.google.android.media.tv.companionlibrary.model.InternalProviderData;
 import com.google.android.media.tv.companionlibrary.model.Program;
+import com.google.android.media.tv.companionlibrary.model.TifExtension;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -50,6 +51,19 @@ public class SampleJobService extends EpgSyncJobService {
     private String MPEG_DASH_PROGRAM_URL
             = "http://ecx.images-amazon.com/images/I/61aoo6-ulML.png";
     private int MPEG_DASH_ORIGINAL_NETWORK_ID = 101;
+
+    private static final String SPORTS_GENRE = "Sports";
+    private List<String> GENRE_CHANNEL_NAMES = Arrays.asList(
+            "Genre Channel 1",
+            "Genre Channel 2",
+            "Genre Channel 3",
+            "Genre Channel 4",
+            "Genre Channel 5");
+
+    private String GENRE_CHANNEL_LOGO
+            = "http://ecx.images-amazon.com/images/I/21tj+38IfML.png";
+    private String GENRE_PROGRAM_URL
+            = "http://ecx.images-amazon.com/images/I/61TnDMKesdL.png";
     private String TEARS_OF_STEEL_TITLE = "Tears of Steel";
     private String TEARS_OF_STEEL_DESCRIPTION = "Monsters invade a small town in this sci-fi flick";
     private String TEARS_OF_STEEL_ART
@@ -99,16 +113,17 @@ public class SampleJobService extends EpgSyncJobService {
      * This is a sample implementation of getChannels() which shows how to retrieve channels from an
      * XML resource file and create programmatically inline.
      *
-     * There are 8 channels retrieved here and then inserted into the TIF Database.
+     * There are 13 channels retrieved here and then inserted into the TIF Database.
      *
      * Channels 1, 2 and 3 are retrieved from the resource XML file: rich_tv_input_xmltv_feed.xml
-     * Channels 4 - 8 are created programmatically in this method.
+     * Channels 4 - 13 are created programmatically in this method. Channels 9-13 will also appear on
+     * Genre row in the Live Tab, if Live Tab is available in the Marketplace.
      *
      * Channels 1 and 2 are deeplink integrated meaning we insert a URI to launch this app
      * to playback content in a custom player. This URI is invoked when a user selects the channel
      * in the Fire TV UI.
      *
-     * Channels 3 and 4 are integrated with the Fire TV Native Player meaning they will be played
+     * Channels 3, 4 and 9-13 are integrated with the Fire TV Native Player meaning they will be played
      * as part of the Fire TV UI - this uses the same mechanism used to implement preview playback.
      *
      * Channels 5 - 8 are integrated with external metadata meaning these channels receive all
@@ -176,34 +191,79 @@ public class SampleJobService extends EpgSyncJobService {
             channelList.add(externalMetadataChannel);
         }
 
+        //Add channel programmatically with Genre information
+        List<Channel> genreChannels = Arrays.asList(
+                new Channel.Builder()
+                        .setDisplayName(GENRE_CHANNEL_NAMES.get(0))
+                        .setDisplayNumber("9")
+                        .setChannelLogo(GENRE_CHANNEL_LOGO)
+                        .setOriginalNetworkId(110)
+                        .setTifExtension(new TifExtension.Builder()
+                                .setGenre(SPORTS_GENRE)
+                                .build())
+                        .build(),
+                new Channel.Builder()
+                        .setDisplayName(GENRE_CHANNEL_NAMES.get(1))
+                        .setDisplayNumber("10")
+                        .setChannelLogo(GENRE_CHANNEL_LOGO)
+                        .setOriginalNetworkId(111)
+                        .setTifExtension(new TifExtension.Builder()
+                                .setGenre(SPORTS_GENRE)
+                                .build())
+                        .build(),
+                new Channel.Builder()
+                        .setDisplayName(GENRE_CHANNEL_NAMES.get(2))
+                        .setDisplayNumber("11")
+                        .setChannelLogo(GENRE_CHANNEL_LOGO)
+                        .setOriginalNetworkId(112)
+                        .setTifExtension(new TifExtension.Builder()
+                                .setGenre(SPORTS_GENRE)
+                                .build())
+                        .build(),
+                new Channel.Builder()
+                        .setDisplayName(GENRE_CHANNEL_NAMES.get(3))
+                        .setDisplayNumber("12")
+                        .setChannelLogo(GENRE_CHANNEL_LOGO)
+                        .setOriginalNetworkId(113)
+                        .setTifExtension(new TifExtension.Builder()
+                                .setGenre(SPORTS_GENRE)
+                                .build())
+                        .build(),
+                new Channel.Builder()
+                        .setDisplayName(GENRE_CHANNEL_NAMES.get(4))
+                        .setDisplayNumber("13")
+                        .setChannelLogo(GENRE_CHANNEL_LOGO)
+                        .setOriginalNetworkId(114)
+                        .setTifExtension(new TifExtension.Builder()
+                                .setGenre(SPORTS_GENRE)
+                                .build())
+                        .build()
+        );
+        channelList.addAll(genreChannels);
+
         return channelList;
     }
 
     @Override
     public List<Program> getProgramsForChannel(Uri channelUri, Channel channel, long startMs,
-            long endMs) {
+                                               long endMs) {
+        // Programmatically add channel
+        List<Program> programsTears = new ArrayList<>();
+        InternalProviderData internalProviderData = new InternalProviderData();
+        internalProviderData.setVideoType(Util.TYPE_DASH);
+        internalProviderData.setVideoUrl(TEARS_OF_STEEL_SOURCE);
+
+        String description;
+        String thumbnail;
+
         if (channel.getDisplayName().equals(MPEG_DASH_CHANNEL_NAME)) {
-            // Programmatically add channel
-            List<Program> programsTears = new ArrayList<>();
-            InternalProviderData internalProviderData = new InternalProviderData();
-            internalProviderData.setVideoType(Util.TYPE_DASH);
-            internalProviderData.setVideoUrl(TEARS_OF_STEEL_SOURCE);
-
-            programsTears.add(new Program.Builder()
-                    .setTitle(TEARS_OF_STEEL_TITLE)
-                    .setStartTimeUtcMillis(TEARS_OF_STEEL_START_TIME_MS)
-                    .setEndTimeUtcMillis(TEARS_OF_STEEL_START_TIME_MS + TEARS_OF_STEEL_DURATION_MS)
-                    .setDescription(TEARS_OF_STEEL_DESCRIPTION)
-                    .setCanonicalGenres(new String[] {TvContract.Programs.Genres.TECH_SCIENCE,
-                            TvContract.Programs.Genres.MOVIES})
-                    .setContentRatings(new TvContentRating[]{TvContentRating.createRating(ANDROID_TV_RATING,"US_TV", "US_TV_PG")})
-                    .setPosterArtUri(TEARS_OF_STEEL_ART)
-                    .setThumbnailUri(MPEG_DASH_PROGRAM_URL)
-                    .setInternalProviderData(internalProviderData)
-                    .build());
-
-            return programsTears;
-        } else if (channel.getInternalProviderData() != null && channel.getInternalProviderData().getExternalIdValue() != null) {
+            description = TEARS_OF_STEEL_DESCRIPTION;
+            thumbnail = MPEG_DASH_PROGRAM_URL;
+        } else if (GENRE_CHANNEL_NAMES.contains(channel.getDisplayName())) {
+            description = "Program for genre tagged channel: " + TEARS_OF_STEEL_DESCRIPTION;
+            thumbnail = GENRE_PROGRAM_URL;
+        } else if (channel.getInternalProviderData() != null && channel.getInternalProviderData()
+                .getExternalIdValue() != null) {
             // Has external metadata provided , no need to insert programs
             return Collections.emptyList();
         } else {
@@ -211,5 +271,19 @@ public class SampleJobService extends EpgSyncJobService {
             XmlTvParser.TvListing listings = RichFeedUtil.getRichTvListings(getApplicationContext());
             return listings.getPrograms(channel);
         }
+        programsTears.add(new Program.Builder()
+                    .setTitle(TEARS_OF_STEEL_TITLE)
+                    .setStartTimeUtcMillis(TEARS_OF_STEEL_START_TIME_MS)
+                    .setEndTimeUtcMillis(TEARS_OF_STEEL_START_TIME_MS + TEARS_OF_STEEL_DURATION_MS)
+                    .setDescription(description)
+                    .setCanonicalGenres(new String[] {TvContract.Programs.Genres.TECH_SCIENCE,
+                            TvContract.Programs.Genres.MOVIES})
+                    .setContentRatings(new TvContentRating[]{TvContentRating.createRating(ANDROID_TV_RATING,
+                            "US_TV", "US_TV_PG")})
+                    .setPosterArtUri(TEARS_OF_STEEL_ART)
+                    .setThumbnailUri(thumbnail)
+                    .setInternalProviderData(internalProviderData)
+                    .build());
+            return programsTears;
     }
 }
