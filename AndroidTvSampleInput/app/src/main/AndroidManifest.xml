@@ -48,6 +48,7 @@
         android:allowBackup="false"
         android:icon="@drawable/android_48dp"
         android:label="@string/app_name"
+        android:banner="@drawable/banner"
         android:theme="@style/Theme.Leanback">
 
         <activity android:name=".MainActivity">
