@@ -110,7 +110,12 @@
             </intent-filter>
         </receiver>
 
-        <receiver android:name=".InitializationReceiver">
+        <!-- INITIALIZE_PROGRAMS is sent out after app has been installed.
+        This receiver can be used to sync channels data to the device (TIF database)
+        before opening the app. -->
+        <receiver android:name=".InitializationReceiver"
+            android:exported="true"
+            >
             <intent-filter>
                 <action android:name="android.media.tv.action.INITIALIZE_PROGRAMS" />
             </intent-filter>
