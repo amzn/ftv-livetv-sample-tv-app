@@ -17,8 +17,12 @@ public class InitializationReceiver extends BroadcastReceiver {
     /**
      * Receives intent with action INITIALIZE_PROGRAMS which is broadcast after installation.
      * This can be leveraged to sync channel data to the device (TIF database) after
-     * installation without opening the application. Use the below commands to see the relevant
-     * logs:
+     * installation without opening the application.
+     *
+     * NOTE: For more information on what channel data to push to the device see:
+     * https://developer.amazon.com/docs/fire-tv/tv-input-framework-on-fire-tv.html#live-channel-entitlements
+     *
+     * Use the below command to see the relevant logs:
      *
      * adb logcat TvInputChangeReceiver:D TvContractUtils:D InitializationReceiver:D *:S
      *
