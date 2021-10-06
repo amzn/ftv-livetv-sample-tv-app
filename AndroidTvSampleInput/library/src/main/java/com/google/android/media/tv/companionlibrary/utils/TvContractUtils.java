@@ -16,15 +16,12 @@
 
 package com.google.android.media.tv.companionlibrary.utils;
 
+
 import android.content.ContentResolver;
-import android.content.ContentUris;
-import android.content.ContentValues;
 import android.content.Context;
-import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.media.tv.TvContentRating;
 import android.media.tv.TvContract;
-import android.media.tv.TvContract.Channels;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.support.annotation.NonNull;
@@ -32,7 +29,7 @@ import android.text.TextUtils;
 import android.util.Log;
 import android.util.LongSparseArray;
 import android.util.SparseArray;
-import com.google.android.media.tv.companionlibrary.BaseTvInputService;
+
 import com.google.android.media.tv.companionlibrary.model.Channel;
 import com.google.android.media.tv.companionlibrary.model.Program;
 
@@ -52,20 +49,31 @@ import java.util.Map;
  */
 public class TvContractUtils {
 
-    /** Indicates that no source type has been defined for this video yet */
+    /**
+     * Indicates that no source type has been defined for this video yet
+     */
     public static final int SOURCE_TYPE_INVALID = -1;
-    /** Indicates that the video will use MPEG-DASH (Dynamic Adaptive Streaming over HTTP) for
+    /**
+     * Indicates that the video will use MPEG-DASH (Dynamic Adaptive Streaming over HTTP) for
      * playback.
      */
     public static final int SOURCE_TYPE_MPEG_DASH = 0;
-    /** Indicates that the video will use SS (Smooth Streaming) for playback. */
+    /**
+     * Indicates that the video will use SS (Smooth Streaming) for playback.
+     */
     public static final int SOURCE_TYPE_SS = 1;
-    /** Indicates that the video will use HLS (HTTP Live Streaming) for playback. */
+    /**
+     * Indicates that the video will use HLS (HTTP Live Streaming) for playback.
+     */
     public static final int SOURCE_TYPE_HLS = 2;
-    /** Indicates that the video will use HTTP Progressive for playback. */
+    /**
+     * Indicates that the video will use HTTP Progressive for playback.
+     */
     public static final int SOURCE_TYPE_HTTP_PROGRESSIVE = 3;
 
-    /** The Input ID when the Sample Input Service initialized the service */
+    /**
+     * The Input ID when the Sample Input Service initialized the service
+     */
     public static final String INPUT_ID = "com.example.android.sampletvinput/.rich.RichTvInputService";
 
     private static final String TAG = "TvContractUtils";
@@ -104,144 +112,147 @@ public class TvContractUtils {
      * original network ID field of the object being set with a unique ID to recognize channels
      * previously inserted. Fire TV does not use this field so the app is free to use it as needed.
      *
-     * @param context The application's context.
-     * @param inputId The ID of the TV input service that provides this TV channel.
+     * @param context  The application's context.
+     * @param inputId  The ID of the TV input service that provides this TV channel.
      * @param channels The updated list of channels. The Provider should be responsible to figure out
-     * its own way to collecting those channels. Referring to the method in "getChannels()" in SampleJobService.java
+     *                 its own way to collecting those channels. Referring to the method in "getChannels()" in SampleJobService.java
      */
     public static void updateChannelsWithTif(Context context, String inputId, List<Channel> channels) {
-        // Create a map from original network ID to channel row ID for existing channels.
-        SparseArray<Long> channelMap = new SparseArray<>();
-        Uri channelsUri = TvContract.buildChannelsUriForInput(inputId);
-        String[] projection = {Channels._ID, Channels.COLUMN_ORIGINAL_NETWORK_ID};
-        ContentResolver resolver = context.getContentResolver();
-        try (Cursor cursor = resolver.query(channelsUri, projection, null, null, null))
-        {
-            while (cursor != null && cursor.moveToNext())
-            {
-                long rowId = cursor.getLong(0);
-                int originalNetworkId = cursor.getInt(1);
-                channelMap.put(originalNetworkId, rowId);
-            }
-        } catch (Exception e) {
-            Log.w(TAG, "Unable to get channels", e);
-        }
-
-        // If a channel exists, update it. If not, insert a new one.
-        Map<Uri, String> logos = new HashMap<>();
-        List<TifExtensionChannel> tifExtensionChannels = new ArrayList<>();
-        for (Channel channel : channels) {
-            ContentValues values = new ContentValues();
-            values.put(Channels.COLUMN_INPUT_ID, inputId);
-            values.putAll(channel.toContentValues());
-            // If some required fields are not populated, the app may crash, so defaults are used
-            if (channel.getPackageName() == null) {
-                // If channel does not include package name, it will be added
-                values.put(Channels.COLUMN_PACKAGE_NAME, context.getPackageName());
-            }
-            if (channel.getInputId() == null) {
-                // If channel does not include input id, it will be added
-                values.put(Channels.COLUMN_INPUT_ID, inputId);
-            }
-            if (channel.getType() == null) {
-                // If channel does not include type it will be added
-                values.put(Channels.COLUMN_TYPE, Channels.TYPE_OTHER);
-            }
-
-            Long rowId = channelMap.get(channel.getOriginalNetworkId());
-            Uri uri;
-            if (rowId == null) {
-                uri = resolver.insert(TvContract.Channels.CONTENT_URI, values);
-                if (DEBUG) {
-                    Log.d(TAG, "Adding channel " + channel.getOriginalNetworkId() + " at " + uri);
-                }
-            } else {
-                values.put(Channels._ID, rowId);
-                uri = TvContract.buildChannelUri(rowId);
-                if (DEBUG) {
-                    Log.d(TAG, "Updating channel " + channel.getOriginalNetworkId() + " at " + uri);
-                }
-                resolver.update(uri, values, null, null);
-                channelMap.remove(channel.getOriginalNetworkId());
-            }
-            if (channel.getChannelLogo() != null && !TextUtils.isEmpty(channel.getChannelLogo())) {
-                logos.put(TvContract.buildChannelLogoUri(uri), channel.getChannelLogo());
-            }
-            if (channel.getTifExtension() != null) {
-                tifExtensionChannels.add(new TifExtensionChannel.Builder()
-                        .setChannelId(ContentUris.parseId(uri))
-                        .setInputId(channel.getInputId() == null ? inputId : channel.getInputId())
-                        .setTifExtension(channel.getTifExtension())
-                        .build());
-            }
-        }
-        if (!logos.isEmpty()) {
-            new InsertLogosTask(context).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, logos);
-        }
-        if (!tifExtensionChannels.isEmpty()) {
-            bulkInsertTIFExtensionChannels(resolver, tifExtensionChannels);
-        }
-
-        // Deletes channels which don't exist in the new feed.
-        int size = channelMap.size();
-        for (int i = 0; i < size; ++i) {
-            Long rowId = channelMap.valueAt(i);
-            if (DEBUG) {
-                Log.d(TAG, "Deleting channel " + rowId);
-            }
-            resolver.delete(TvContract.buildChannelUri(rowId), null, null);
-            SharedPreferences.Editor editor = context.getSharedPreferences(
-                    BaseTvInputService.PREFERENCES_FILE_KEY, Context.MODE_PRIVATE).edit();
-            editor.remove(BaseTvInputService.SHARED_PREFERENCES_KEY_LAST_CHANNEL_AD_PLAY + rowId);
-            editor.apply();
-        }
+        ContentResolver contentResolver = context.getContentResolver();
+        processChannels(contentResolver, channels, inputId, context.getPackageName());
+        updateChannelMetadata(contentResolver, channels, context);
     }
 
     /**
-     * Bulk inserts channels in TifExtension.
+     * Helper method to encapsulate the logic for updating, adding and deleting channels in the TIF database.
+     * Comparison of Channel object in DB vs Channel object from Provider is done
+     * via Channel equals() method.
      *
-     * @param resolver Application's ContentResolver.
-     * @param tifExtensionChannels The List of channels to be inserted in TifExtension.
+     * @param contentResolver Handles query operations against TIF database
+     * @param channels        List of Channel objects sent by the Provider
+     * @param inputId         The ID of the TV input service that provides this TV channel.
      */
-    private static void bulkInsertTIFExtensionChannels(ContentResolver resolver,
-                                                       List<TifExtensionChannel> tifExtensionChannels) {
-        List<ContentValues> extensionValuesList = new ArrayList<>();
+    private static void processChannels(ContentResolver contentResolver, List<Channel> channels, String inputId, String packageName) {
+        // Query channels from TIF
+        List<Channel> tifChannels = ChannelDao.getAllChannels(contentResolver);
 
-        Log.d(TAG, "Received " + tifExtensionChannels.size() + " channels to be added");
-        for (TifExtensionChannel tifExtensionChannel : tifExtensionChannels) {
-            ContentValues extensionValues = new ContentValues();
+        // Provider channels (desired) map (originalNetworkId -> Channel object)
+        LongSparseArray<Channel> desiredChannels = buildChannelMap(channels);
 
-            extensionValues.put(TifExtensionContract.Channels.COLUMN_CHANNEL_ID,
-                    tifExtensionChannel.getChannelId());
+        // Channels to be updated
+        LongSparseArray<Channel> updatedChannels = new LongSparseArray<>();
 
-            extensionValues.put(TifExtensionContract.Channels.COLUMN_INPUT_ID,
-                    tifExtensionChannel.getInputId());
-            if (tifExtensionChannel.getTifExtension().getGenre() != null) {
-                extensionValues.put(TifExtensionContract.Channels.COLUMN_GENRE,
-                        tifExtensionChannel.getTifExtension().getGenre());
-                Log.d(TAG, "For ChannelId: " + tifExtensionChannel.getChannelId() +
-                        " genre set to " + tifExtensionChannel.getTifExtension().getGenre());
+        // Channels to be deleted
+        List<Long> deletedChannelIds = new ArrayList<>();
+
+        // null cursor means TIF state is unknown
+        if (tifChannels == null) {
+            // If a channel has been removed from the TIF Channel table,
+            // Live TV will handle the removal of the hanging metadata in TifExtension
+            ChannelDao.deleteAllChannels(contentResolver);
+        } else {
+            for (Channel tifChannel : tifChannels) {
+                Channel lookupChannel = desiredChannels.get(tifChannel.getOriginalNetworkId());
+                if (lookupChannel != null) {
+                    // remove so its not included in the bulk insert at the end
+                    desiredChannels.remove(lookupChannel.getOriginalNetworkId());
+
+                    // check for difference between database (tifChannel) and
+                    // channel from provider (lookupChannel)
+                    if (!tifChannel.equals(lookupChannel)) {
+                        Log.d(TAG, "Channel with network id " + tifChannel.getOriginalNetworkId() + ", row id " + tifChannel.getId() + " needs to be updated");
+                        Log.d(TAG, "Channel from DB: " + tifChannel.toString());
+                        Log.d(TAG, "Channel from provider: " + lookupChannel.toString());
+
+                        Channel updatedChanel = new Channel.Builder(lookupChannel)
+                                .setId(tifChannel.getId())
+                                .build();
+                        updatedChannels.put(updatedChanel.getOriginalNetworkId(), updatedChanel);
+                    } else {
+                        Log.d(TAG, "Channel with network id " + tifChannel.getOriginalNetworkId() + " is already up to date");
+                    }
+                } else {
+                    // Channel exists in DB but not in channels sent by provider so delete is required
+                    Log.d(TAG, "Channel with network id " + tifChannel.getOriginalNetworkId() + " needs to be deleted");
+                    deletedChannelIds.add(tifChannel.getId());
+                }
             }
-            extensionValuesList.add(extensionValues);
         }
 
-        try {
-            // Insert or CONFLICT_REPLACE channels into TifExtension
-            ContentValues[] insertBulk = extensionValuesList.toArray(
-                    new ContentValues[extensionValuesList.size()]);
-            int rowsCreated =  resolver.bulkInsert(TifExtensionContract.Channels.CONTENT_URI,
-                    insertBulk);
-            Log.d(TAG, "Successfully added " + rowsCreated + " in TifExtension");
-        } catch (Exception e) {
-            Log.d(TAG, "Exception in bulk inserting channels " + e);
+        ChannelDao.upsertChannels(
+                contentResolver,
+                desiredChannels,
+                updatedChannels,
+                inputId,
+                packageName
+        );
+
+        ChannelDao.deleteChannels(
+                contentResolver,
+                deletedChannelIds
+        );
+    }
+
+    /**
+     * Helper method to handle inserting logos for channels and updating the TIF extension db with
+     * genre information. This function relies on channels being present and up to date in the TIF
+     * channel table
+     *
+     * @param contentResolver Handles query operations against TIF database
+     * @param channels        List of channels sent by the Provider
+     * @param context         The application's context
+     */
+    private static void updateChannelMetadata(ContentResolver contentResolver, List<Channel> channels, Context context) {
+        List<Channel> currentTifChannels = ChannelDao.getAllChannels(contentResolver);
+        LongSparseArray<Channel> desiredChannels = buildChannelMap(channels);
+
+        if (currentTifChannels != null) {
+            //Insert channel logos
+            insertChannelLogos(context, currentTifChannels, desiredChannels);
+
+            List<TifExtensionChannel> tifExtensionChannels = ConverterUtils
+                    .convertToTifExtensionChannel(currentTifChannels, desiredChannels);
+
+            // Bulk insert tif extension channels
+            ChannelDao.insertTifExtensionChannels(
+                    contentResolver,
+                    tifExtensionChannels
+            );
         }
+    }
+
+    private static void insertChannelLogos(Context context, List<Channel> channels, LongSparseArray<Channel> desiredChannels) {
+        Map<Uri, String> logos = new HashMap<>();
+        for (Channel channel : channels) {
+            Channel lookupChannel = desiredChannels.get(channel.getOriginalNetworkId());
+            // Check if the channel has a logo associated with it
+            // get row id of channel to determine URI
+            if (lookupChannel != null && !TextUtils.isEmpty(lookupChannel.getChannelLogo())) {
+                Log.d(TAG, "Adding logo for channel with network id " + channel.getOriginalNetworkId());
+                logos.put(TvContract.buildChannelLogoUri(channel.getId()), lookupChannel.getChannelLogo());
+            }
+        }
+
+        if (!logos.isEmpty()) {
+            new InsertLogosTask(context).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, logos);
+        }
+    }
+
+    private static LongSparseArray<Channel> buildChannelMap(List<Channel> channels) {
+        LongSparseArray<Channel> channelMap = new LongSparseArray<>();
+
+        for (Channel channel : channels) {
+            channelMap.put(channel.getOriginalNetworkId(), channel);
+        }
+
+        return channelMap;
     }
 
     /**
      * Builds a map of available channels.
      *
      * @param resolver Application's ContentResolver.
-     * @param inputId The ID of the TV input service that provides this TV channel.
+     * @param inputId  The ID of the TV input service that provides this TV channel.
      * @return LongSparseArray mapping each channel's {@link TvContract.Channels#_ID} to the
      * Channel object.
      * @hide
@@ -276,65 +287,9 @@ public class TvContractUtils {
     }
 
     /**
-     * Returns the current list of channels your app provides.
-     *
-     * @param resolver Application's ContentResolver.
-     * @return List of channels.
-     */
-    public static List<Channel> getChannels(ContentResolver resolver) {
-        List<Channel> channels = new ArrayList<>();
-        // TvProvider returns programs in chronological order by default.
-        Cursor cursor = null;
-        try {
-            cursor = resolver.query(Channels.CONTENT_URI, Channel.PROJECTION, null, null, null);
-            if (cursor == null || cursor.getCount() == 0) {
-                return channels;
-            }
-            while (cursor.moveToNext()) {
-                channels.add(Channel.fromCursor(cursor));
-            }
-        } catch (Exception e) {
-            Log.w(TAG, "Unable to get channels", e);
-        } finally {
-            if (cursor != null) {
-                cursor.close();
-            }
-        }
-        return channels;
-    }
-
-    /**
-     * Returns the {@link Channel} with specified channel URI.
-     * @param resolver {@link ContentResolver} used to query database.
-     * @param channelUri URI of channel.
-     * @return An channel object with specified channel URI.
-     * @hide
-     */
-    public static Channel getChannel(ContentResolver resolver, Uri channelUri) {
-        Cursor cursor = null;
-        try {
-            cursor = resolver.query(channelUri, Channel.PROJECTION, null, null, null);
-            if (cursor == null || cursor.getCount() == 0) {
-                Log.w(TAG, "No channel matches " + channelUri);
-                return null;
-            }
-            cursor.moveToNext();
-            return Channel.fromCursor(cursor);
-        } catch (Exception e) {
-            Log.w(TAG, "Unable to get the channel with URI " + channelUri, e);
-            return null;
-        } finally {
-            if (cursor != null) {
-                cursor.close();
-
-            }
-        }
-    }
-
-    /**
      * Returns the current list of programs on a given channel.
      *
-     * @param resolver Application's ContentResolver.
+     * @param resolver   Application's ContentResolver.
      * @param channelUri Channel's Uri.
      * @return List of programs.
      * @hide
@@ -369,7 +324,7 @@ public class TvContractUtils {
     /**
      * Returns the program that is scheduled to be playing now on a given channel.
      *
-     * @param resolver Application's ContentResolver.
+     * @param resolver   Application's ContentResolver.
      * @param channelUri Channel's Uri.
      * @return The program that is scheduled for now in the EPG.
      */
@@ -390,8 +345,8 @@ public class TvContractUtils {
     /**
      * Returns the program that is scheduled to be playing after a given program on a given channel.
      *
-     * @param resolver Application's ContentResolver.
-     * @param channelUri Channel's Uri.
+     * @param resolver       Application's ContentResolver.
+     * @param channelUri     Channel's Uri.
      * @param currentProgram Program which plays before the desired program.If null, returns current
      *                       program
      * @return The program that is scheduled after given program in the EPG.

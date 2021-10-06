@@ -25,6 +25,9 @@ import android.text.TextUtils;
 
 import com.google.android.media.tv.companionlibrary.utils.CollectionUtils;
 
+import java.util.Arrays;
+import java.util.Objects;
+
 /**
  * A convenience class to create and insert channel entries into the database.
  */
@@ -260,7 +263,7 @@ public final class Channel {
      * TV Input Framework database.
      * @hide
      */
-    public ContentValues toContentValues() {
+    public ContentValues toContentValues(String inputId, String packageName) {
         ContentValues values = new ContentValues();
         if (mId != INVALID_CHANNEL_ID) {
             values.put(TvContract.Channels._ID, mId);
@@ -268,17 +271,17 @@ public final class Channel {
         if (!TextUtils.isEmpty(mPackageName)) {
             values.put(TvContract.Channels.COLUMN_PACKAGE_NAME, mPackageName);
         } else {
-            values.putNull(TvContract.Channels.COLUMN_PACKAGE_NAME);
+            values.put(TvContract.Channels.COLUMN_PACKAGE_NAME, packageName);
         }
         if (!TextUtils.isEmpty(mInputId)) {
             values.put(TvContract.Channels.COLUMN_INPUT_ID, mInputId);
         } else {
-            values.putNull(TvContract.Channels.COLUMN_INPUT_ID);
+            values.put(TvContract.Channels.COLUMN_INPUT_ID, inputId);
         }
         if (!TextUtils.isEmpty(mType)) {
             values.put(TvContract.Channels.COLUMN_TYPE, mType);
         } else {
-            values.putNull(TvContract.Channels.COLUMN_TYPE);
+            values.put(TvContract.Channels.COLUMN_TYPE, TvContract.Channels.TYPE_OTHER);
         }
         if (!TextUtils.isEmpty(mDisplayNumber)) {
             values.put(TvContract.Channels.COLUMN_DISPLAY_NUMBER, mDisplayNumber);
@@ -474,6 +477,24 @@ public final class Channel {
         return baseColumns;
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Channel channel = (Channel) o;
+        return mOriginalNetworkId == channel.mOriginalNetworkId
+                && mTransportStreamId == channel.mTransportStreamId
+                && mServiceId == channel.mServiceId
+                && mSearchable == channel.mSearchable
+                && Objects.equals(mDisplayNumber, channel.mDisplayNumber)
+                && Objects.equals(mDisplayName, channel.mDisplayName)
+                && Objects.equals(mDescription, channel.mDescription)
+                && Objects.equals(mVideoFormat, channel.mVideoFormat)
+                && Arrays.equals(mInternalProviderData, channel.mInternalProviderData)
+                && Objects.equals(mNetworkAffiliation, channel.mNetworkAffiliation)
+                && Objects.equals(mServiceType, channel.mServiceType);
+    }
+
     /**
      * The builder class that makes it easy to chain setters to create a {@link Channel} object.
      */
@@ -495,7 +516,7 @@ public final class Channel {
          * @param id The value of {@link TvContract.Channels#_ID} for the channel.
          * @return This Builder object to allow for chaining of calls to builder methods.
          */
-        private Builder setId(long id) {
+        public Builder setId(long id) {
             mChannel.mId = id;
             return this;
         }
