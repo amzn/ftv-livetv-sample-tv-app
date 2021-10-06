@@ -1,5 +1,7 @@
 package com.google.android.media.tv.companionlibrary.utils;
 
+import android.content.ContentValues;
+
 import com.google.android.media.tv.companionlibrary.model.TifExtension;
 
 /**
@@ -30,6 +32,24 @@ public class TifExtensionChannel {
      * @return The value of {@link TifExtension} for the channel.
      */
     public TifExtension getTifExtension() { return tifExtension; }
+
+    /**
+     * @return The fields of the TifExtension channel in the ContentValues format to be easily
+     * inserted into the TV Input Framework database.
+     */
+    public ContentValues toContentValues() {
+        ContentValues contentValues = new ContentValues();
+
+        contentValues.put(TifExtensionContract.Channels.COLUMN_CHANNEL_ID, channelId);
+
+        contentValues.put(TifExtensionContract.Channels.COLUMN_INPUT_ID, inputId);
+        if (getTifExtension().getGenre() != null) {
+            contentValues.put(TifExtensionContract.Channels.COLUMN_GENRE,
+                    getTifExtension().getGenre());
+        }
+
+        return contentValues;
+    }
 
     public static class Builder {
         private String inputId;
