@@ -38,7 +38,7 @@ import com.example.android.sampletvinput.rich.RichTvInputSetupActivity;
  */
 public class MainFragment extends Fragment {
 
-    public static final String AMAZON_LIVE_TV_DEV_INTEGRATION_URL = "https://developer.amazon.com/docs/fire-tv/live-tv-integration.html";
+    public static final String AMAZON_LIVE_TV_DEV_INTEGRATION_URL = "https://developer.amazon.com/docs/fire-tv/introduction-linear-tv-integration.html";
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,

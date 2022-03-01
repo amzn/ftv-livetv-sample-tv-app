@@ -44,10 +44,12 @@ import com.google.android.exoplayer.MediaFormat;
 import com.google.android.exoplayer.text.CaptionStyleCompat;
 import com.google.android.exoplayer.text.Cue;
 import com.google.android.exoplayer.text.SubtitleLayout;
+import com.google.android.exoplayer.util.Util;
 import com.google.android.media.tv.companionlibrary.BaseTvInputService;
 import com.google.android.media.tv.companionlibrary.EpgSyncJobService;
 import com.google.android.media.tv.companionlibrary.TvPlayer;
 import com.google.android.media.tv.companionlibrary.model.Channel;
+import com.google.android.media.tv.companionlibrary.model.InternalProviderData;
 import com.google.android.media.tv.companionlibrary.model.Program;
 
 import java.util.ArrayList;
@@ -107,6 +109,12 @@ public class RichTvInputService extends BaseTvInputService {
         private static final float CAPTION_LINE_HEIGHT_RATIO = 0.0533f;
         private static final int TEXT_UNIT_PIXELS = 0;
         private static final String UNKNOWN_LANGUAGE = "und";
+
+        private static final String GRACENOTE_ID = "gracenote_ontv";
+
+        // Example MPEG-DASH test content from Telecom Paris. Stream is licensed Creative Commons.
+        // See http://download.tsi.telecom-paristech.fr/gpac/dataset/dash/uhd/ for more information.
+        private static final String GRACENOTE_TEST_STREAM_URL = "http://download.tsi.telecom-paristech.fr/gpac/DASH_CONFORMANCE/TelecomParisTech/mp4-live/mp4-live-mpd-AV-NBS.mpd";
 
         private int mSelectedSubtitleTrackIndex;
         private SubtitleLayout mSubtitleView;
@@ -194,23 +202,63 @@ public class RichTvInputService extends BaseTvInputService {
          * it to play when ready
          */
         @Override
-        public boolean onPlayProgram(Program program, long startPosMs) {
-            if (program == null) {
-                requestEpgSync(getCurrentChannelUri());
-                notifyVideoUnavailable(TvInputManager.VIDEO_UNAVAILABLE_REASON_TUNING);
-                return false;
+        public boolean onPlayProgram(Program program, long startPosMs, Channel channel) {
+            // Play the specified program (if it exists).
+            boolean programExists = (null != program);
+            if (programExists)
+            {
+                // The feed for the program is stored in its internalProviderData column.
+                createPlayer(program.getInternalProviderData().getVideoType(),
+                        Uri.parse(program.getInternalProviderData().getVideoUrl()));
+                if (startPosMs > 0) {
+                    mPlayer.seekTo(startPosMs);
+                }
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                    notifyTimeShiftStatusChanged(TvInputManager.TIME_SHIFT_STATUS_AVAILABLE);
+                }
+                mPlayer.setPlayWhenReady(true);
+                return true;
             }
-            // The feed for the program is stored in its internalProviderData column
-            createPlayer(program.getInternalProviderData().getVideoType(),
-                    Uri.parse(program.getInternalProviderData().getVideoUrl()));
-            if (startPosMs > 0) {
-                mPlayer.seekTo(startPosMs);
+
+            // Determine if the channel being played is populated with program metadata from an external
+            // catalog. The `program` argument of this method only refers to TIF-based program metadata,
+            // so if external catalog data is being used, the missing program is expected and we should
+            // display content based on the channel alone.
+            //
+            // NOTE: "External catalog" can refer to either Gracenote or to Amazon's native catalog.
+            //       See https://developer.amazon.com/docs/catalog/getting-started-catalog-ingestion.html.
+            boolean canPlayFromExternalCatalogData = false;
+            boolean channelExists = (null != channel);
+            if (channelExists) {
+                InternalProviderData channelInternalProviderData = channel.getInternalProviderData();
+                boolean channelHasInternalProviderData = (null != channelInternalProviderData);
+                if (channelHasInternalProviderData) {
+                    String channelExternalIdType = channelInternalProviderData.getExternalIdType();
+                    boolean channelHasExternalIdType = (null != channelExternalIdType);
+                    if (channelHasExternalIdType) {
+                        canPlayFromExternalCatalogData = channelExternalIdType.equals(GRACENOTE_ID);
+                    }
+                }
             }
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                notifyTimeShiftStatusChanged(TvInputManager.TIME_SHIFT_STATUS_AVAILABLE);
+
+            // Play content for the specified channel (if possible).
+            if (canPlayFromExternalCatalogData)
+            {
+                // A simple test stream is played for all Gracenote channels. A production-ready implementation
+                // would obviously be more complex and would need to select the appropriate stream for the channel.
+                createPlayer(
+                        Util.TYPE_DASH,
+                        Uri.parse(GRACENOTE_TEST_STREAM_URL));
+                mPlayer.setPlayWhenReady(true);
+                return true;
             }
-            mPlayer.setPlayWhenReady(true);
-            return true;
+
+            // A program was not specified and either a channel was not specified or the specified channel
+            // does not get metadata from an external catalog, so we have nothing to display. We can request
+            // an EPG sync in case that resolves the metadata issue within the TIF database.
+            requestEpgSync(getCurrentChannelUri());
+            notifyVideoUnavailable(TvInputManager.VIDEO_UNAVAILABLE_REASON_TUNING);
+            return false;
         }
 
         public TvPlayer getTvPlayer() {
