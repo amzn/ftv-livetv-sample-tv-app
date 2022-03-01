@@ -461,11 +461,11 @@ public abstract class BaseTvInputService extends TvInputService {
         private boolean playCurrentProgram() {
             if (mCurrentProgram == null) {
                 Log.w(TAG, "Failed to get program info for " + mChannelUri + ". Try to do an " +
-                            "EPG sync.");
-                return onPlayProgram(null, 0);
+                            "EPG sync. This may be expected if this is a Gracenote channel.");
+                return onPlayProgram(null, 0, mCurrentChannel);
             }
             calculateElapsedTimesFromCurrentTime();
-            return onPlayProgram(mCurrentProgram, mElapsedProgramTime);
+            return onPlayProgram(mCurrentProgram, mElapsedProgramTime, mCurrentChannel);
         }
 
         private void playCurrentChannel() {
@@ -484,11 +484,17 @@ public abstract class BaseTvInputService extends TvInputService {
          * {@code null}. Developers should check the null condition and handle that case, possibly
          * by manually resyncing the EPG.
          *
+         * If program metadata is being provided externally for a channel (i.e. via Gracenote) there
+         * may be no corresponding current program in the TIF database. The tuned channel is provided
+         * so that developers can determine if a {@code null} value for {@code program} represents
+         * an error or not in these cases.
+         *
          * @param program The program that is set to be playing for a the currently tuned channel.
          * @param startPosMs Start position of content video.
+         * @param channel The currently tuned channel.
          * @return Whether playing this program was successful.
          */
-        public abstract boolean onPlayProgram(Program program, long startPosMs);
+        public abstract boolean onPlayProgram(Program program, long startPosMs, Channel channel);
 
         /**
          * This method is called when the user tunes to a given channel. Developers can override

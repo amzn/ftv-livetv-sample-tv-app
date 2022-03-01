@@ -191,6 +191,21 @@ public class InternalProviderData {
     }
 
     /**
+     * Gets the external ID type for the channel.
+     *
+     * @return The external ID type
+     */
+    public String getExternalIdType() {
+        if (mJsonObject.has(KEY_AMZN_EXTERNAL_ID_TYPE)) {
+            try {
+                return mJsonObject.getString(KEY_AMZN_EXTERNAL_ID_TYPE);
+            } catch (JSONException ignored) {
+            }
+        }
+        return null;
+    }
+
+    /**
      * Sets the external ID value for the channel. Both type and value must be set.
      *
      * @param externalIdValue The external ID value
