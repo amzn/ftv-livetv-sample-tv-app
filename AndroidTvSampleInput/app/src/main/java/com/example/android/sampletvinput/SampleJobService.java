@@ -97,8 +97,12 @@ public class SampleJobService extends EpgSyncJobService {
     private static final String INPUT_ID = PACKAGE_NAME + "/.rich.RichTvInputService";
 
     /**
-     * Gracenote is a provider of external metadata integrated with Fire TV. This is one valid type
-     * of external metadata. Refer to the Live TV integration docs for all valid values.
+     * A station's ID type is used to determine where station metadata will be retrieved from.
+     * If the station metadata provider is Gracenote, use the corresponding Gracenote id type.
+     * If your organization integrates directly with Amazon's catalog to supply station metadata,
+     * use the ID type defined during catalog integration.
+     *
+     * Refer to the Live TV integration docs for all valid values.
      */
     private final static String GRACENOTE_ID = "gracenote_ontv";
 
@@ -173,7 +177,9 @@ public class SampleJobService extends EpgSyncJobService {
                 .build();
         channelList.add(channelTears);
 
-        // Add channels which will receive external metadata
+        // Add channels which will receive external metadata.  For channels whose metadata is supplied by Gracenote,
+        // use the Gracenote channel IDs.  If your organization integrates directly with Amazon's catalog to supply
+        // station metadata, use the station IDs defined during catalog integration.
         List<String> externalGracenoteIds = Arrays.asList("10051", "10057", "10138", "58780");
         int startChannelNum = 5;
         for (String id : externalGracenoteIds) {
