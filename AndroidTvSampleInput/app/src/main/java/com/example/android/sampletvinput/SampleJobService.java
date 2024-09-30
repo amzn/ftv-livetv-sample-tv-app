@@ -21,13 +21,14 @@ import android.media.tv.TvContentRating;
 import android.media.tv.TvContract;
 import android.net.Uri;
 import com.example.android.sampletvinput.rich.RichFeedUtil;
-import com.google.android.exoplayer.util.Util;
+import com.google.android.exoplayer2.util.Util;
 import com.google.android.media.tv.companionlibrary.EpgSyncJobService;
 import com.google.android.media.tv.companionlibrary.XmlTvParser;
 import com.google.android.media.tv.companionlibrary.model.Channel;
 import com.google.android.media.tv.companionlibrary.model.InternalProviderData;
 import com.google.android.media.tv.companionlibrary.model.Program;
 import com.google.android.media.tv.companionlibrary.model.TifExtension;
+import com.google.android.media.tv.companionlibrary.utils.TvContractUtils;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -256,7 +257,7 @@ public class SampleJobService extends EpgSyncJobService {
         // Programmatically add channel
         List<Program> programsTears = new ArrayList<>();
         InternalProviderData internalProviderData = new InternalProviderData();
-        internalProviderData.setVideoType(Util.TYPE_DASH);
+        internalProviderData.setVideoType(TvContractUtils.SOURCE_TYPE_MPEG_DASH);
         internalProviderData.setVideoUrl(TEARS_OF_STEEL_SOURCE);
 
         String description;

@@ -51,21 +51,24 @@
         android:banner="@drawable/banner"
         android:theme="@style/Theme.Leanback">
 
-        <activity android:name=".MainActivity">
+        <activity android:name=".MainActivity"
+            android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LEANBACK_LAUNCHER" />
             </intent-filter>
         </activity>
 
-        <activity android:name=".DemoPlayerActivity">
+        <activity android:name=".DemoPlayerActivity"
+            android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
             </intent-filter>
         </activity>
         <!-- Launched by the TV app before it uses RichTvInputService. This registers channels and
         sets up SampleJobService to provide program information in the background. -->
-        <activity android:name=".rich.RichTvInputSetupActivity" >
+        <activity android:name=".rich.RichTvInputSetupActivity"
+            android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
             </intent-filter>
@@ -84,6 +87,7 @@
         -->
         <service
             android:name=".rich.RichTvInputService"
+            android:exported="true"
             android:label="@string/rich_input_label"
             android:permission="android.permission.BIND_TV_INPUT">
             <!-- Required filter used by the system to launch our account service. -->
@@ -104,7 +108,8 @@
             android:exported="true" />
 
         <!-- This receiver is for sync job schedule well after reboot. -->
-        <receiver android:name=".rich.RichBootReceiver">
+        <receiver android:name=".rich.RichBootReceiver"
+            android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.BOOT_COMPLETED" />
             </intent-filter>
@@ -121,9 +126,5 @@
             </intent-filter>
         </receiver>
 
-        <!-- Required by IMA SDK to fetch the version number of Google Play Service -->
-        <meta-data
-            android:name="com.google.android.gms.version"
-            android:value="@integer/google_play_services_version" />
     </application>
 </manifest>

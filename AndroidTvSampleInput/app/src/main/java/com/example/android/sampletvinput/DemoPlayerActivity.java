@@ -5,9 +5,11 @@ import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
-import android.widget.MediaController;
 import android.widget.Toast;
-import android.widget.VideoView;
+
+import com.google.android.exoplayer2.ExoPlayer;
+import com.google.android.exoplayer2.MediaItem;
+import com.google.android.exoplayer2.ui.StyledPlayerView;
 import com.google.android.media.tv.companionlibrary.model.InternalProviderData;
 import com.google.android.media.tv.companionlibrary.model.Program;
 import com.google.android.media.tv.companionlibrary.utils.SampleChannelListManager;
@@ -25,15 +27,29 @@ import com.google.android.media.tv.companionlibrary.utils.TvContractUtils;
 public class DemoPlayerActivity extends Activity {
 
     private static final String TAG = DemoPlayerActivity.class.getSimpleName();
+    private ExoPlayer mPlayer;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.demo_player_activity);
-        Toast toast=Toast.makeText(this,"Launch customized player activity",Toast.LENGTH_SHORT);
-        toast.show();
+
+        Toast.makeText(this, "Launch customized player activity", Toast.LENGTH_SHORT).show();
+
+        StyledPlayerView playerView = findViewById(R.id.player_view);
+        mPlayer = new ExoPlayer.Builder(this).build();
+        playerView.setPlayer(mPlayer);
 
         initializePlayerActivity(getIntent());
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        if (mPlayer != null) {
+            mPlayer.release();
+            mPlayer = null;
+        }
     }
 
     private void initializePlayerActivity(final Intent intent) {
@@ -73,14 +89,9 @@ public class DemoPlayerActivity extends Activity {
         Log.i(TAG,"ProgramUri is: " + uri);
 
         // Just set Video here for demo use, you could implement your own player here.
-        final VideoView videoView =(VideoView)findViewById(R.id.player_view);
-        final MediaController mediaController= new MediaController(this);
-
-        mediaController.setAnchorView(videoView);
-        videoView.setMediaController(mediaController);
-        videoView.setVideoURI(uri);
-        videoView.requestFocus();
-
-        videoView.start();
+        MediaItem mediaItem = MediaItem.fromUri(uri);
+        mPlayer.setMediaItem(mediaItem);
+        mPlayer.prepare();
+        mPlayer.play();
     }
 }

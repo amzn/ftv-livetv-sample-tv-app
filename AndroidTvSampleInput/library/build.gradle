@@ -1,26 +1,14 @@
-plugins {
-    id "com.jfrog.bintray" version "1.7"
-}
-
 apply plugin: 'com.android.library'
 apply plugin: 'maven-publish'
 
-ext {
-    appCompatVersion = '27.1.1'
-    playServicesVersion = '12.0.0'
-    supportTestVersion = '1.0.1'
-}
-
 android {
-    compileSdkVersion 27
-    buildToolsVersion "27.0.3"
+    namespace 'com.google.android.media.tv.companionlibrary'
 
     defaultConfig {
-        minSdkVersion 21
-        targetSdkVersion 27
-        versionCode 1
-        versionName "1.0"
-        testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+        compileSdkVersion 34
+        minSdkVersion 22
+        targetSdkVersion 34
+        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
     buildTypes {
         release {
@@ -38,26 +26,30 @@ configurations {
 
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
-    implementation "com.android.support:appcompat-v7:$appCompatVersion"
-    implementation "com.android.support:leanback-v17:$appCompatVersion"
-    implementation 'com.google.ads.interactivemedia.v3:interactivemedia:3.2.1'
-    implementation 'com.google.android.gms:play-services-ads:8.4.0'
+    implementation 'androidx.appcompat:appcompat:1.7.0'
+    implementation 'androidx.leanback:leanback:1.2.0-alpha04'
+    implementation "androidx.localbroadcastmanager:localbroadcastmanager:1.1.0"
+    implementation(platform("org.jetbrains.kotlin:kotlin-bom:1.8.0"))
 
-    testImplementation 'junit:junit:4.12'
-    testImplementation 'org.mockito:mockito-core:1.10.19'
+    testImplementation 'junit:junit:4.13'
+    testImplementation 'org.mockito:mockito-inline:3.12.4'
     testImplementation "org.robolectric:robolectric:3.1"
-    androidTestImplementation "com.android.support:support-annotations:$appCompatVersion"
-    androidTestImplementation "com.android.support.test:runner:$supportTestVersion"
-    androidTestImplementation "com.android.support.test:rules:$supportTestVersion"
-    androidTestImplementation 'com.android.support.test.uiautomator:uiautomator-v18:2.1.3'
+
+    // Update these dependencies to their AndroidX counterparts
+    androidTestImplementation "androidx.annotation:annotation:1.8.2"
+    androidTestImplementation "androidx.test:runner:1.6.2"
+    androidTestImplementation "androidx.test:rules:1.6.1"
+    androidTestImplementation 'androidx.test.uiautomator:uiautomator:2.3.0'
+
     doclava 'com.google.doclava:doclava:1.0.6'
 }
 
-def packageVersion = '0.2'
-
-task sourceJar(type: Jar) {
-    classifier = 'sources'
-    from android.sourceSets.main.java.srcDirs
+android.sourceSets.all { sourceSet ->
+    def taskName = "generate${sourceSet.name.capitalize()}SourcesJar"
+    task(taskName, type: Jar) {
+        archiveClassifier.set("sources")
+        from sourceSet.java.srcDirs
+    }
 }
 
 task javadoc(type: Javadoc, dependsOn: project.configurations.doclava) {
@@ -70,55 +62,12 @@ task javadoc(type: Javadoc, dependsOn: project.configurations.doclava) {
 }
 
 task javadocJar(type: Jar, dependsOn: javadoc) {
-    classifier = 'javadoc'
+    archiveClassifier.set("javadoc")
     from javadoc.destinationDir
 }
 
 afterEvaluate {
     javadoc.classpath += files(android.libraryVariants.collect { variant ->
-        variant.javaCompile.classpath.files
+        variant.getJavaCompileProvider().get().classpath.files
     })
-}
-
-publishing {
-    publications {
-        libraryPublish(MavenPublication) {
-            groupId 'com.google.android.libraries.tv'
-            artifactId 'companionlibrary'
-            version packageVersion
-            artifacts = configurations.archives.artifacts
-            artifact sourceJar
-            artifact javadocJar
-            pom.withXml {
-                def dependenciesNode = asNode().appendNode('dependencies')
-                configurations.compile.allDependencies.each {
-                    if(it.group != null && (it.name != null || "unspecified".equals(it.name)) && it.version != null)
-                    {
-                        def dependencyNode = dependenciesNode.appendNode('dependency')
-                        dependencyNode.appendNode('groupId', it.group)
-                        dependencyNode.appendNode('artifactId', it.name)
-                        dependencyNode.appendNode('version', it.version)
-                    }
-                }
-            }
-        }
-    }
-}
-
-bintray {
-    user = System.getenv('BINTRAY_USER')
-    key = System.getenv('BINTRAY_API_KEY')
-    publications = ['libraryPublish']
-    publish = true
-    pkg {
-        repo = 'tif-companion'
-        name = 'tif-companion'
-        userOrg = 'google'
-        version {
-            name = packageVersion
-            gpg {
-                sign = true
-            }
-        }
-    }
 }

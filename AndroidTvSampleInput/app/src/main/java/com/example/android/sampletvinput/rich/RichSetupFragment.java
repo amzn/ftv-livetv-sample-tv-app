@@ -21,7 +21,8 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.media.tv.TvInputInfo;
 import android.os.Bundle;
-import android.support.v4.content.ContextCompat;
+import androidx.core.content.ContextCompat;
+
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -91,6 +92,7 @@ public class RichSetupFragment extends ChannelSetupFragment {
                     new ComponentName(getActivity(), SampleJobService.class),
                     FULL_SYNC_FREQUENCY_MILLIS, FULL_SYNC_WINDOW_SEC);
             getActivity().setResult(Activity.RESULT_OK);
+            setButtonText("Sync complete");
         } else {
             getActivity().setResult(Activity.RESULT_CANCELED);
         }

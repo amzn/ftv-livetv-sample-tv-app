@@ -3,6 +3,8 @@ package com.google.android.media.tv.companionlibrary.utils;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNull;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.ArgumentMatchers.isNull;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyInt;
 import static org.mockito.Mockito.mock;
@@ -12,6 +14,7 @@ import static org.mockito.Mockito.when;
 import android.content.ContentResolver;
 import android.content.ContentValues;
 import android.database.Cursor;
+import android.media.tv.TvContract;
 import android.net.Uri;
 
 import com.google.android.media.tv.companionlibrary.model.Channel;
@@ -83,7 +86,7 @@ public class ChannelDaoTest {
 
     @Test
     public void testGetAllChannels() {
-        when(contentResolver.query(any(Uri.class), any(String[].class), any(String.class), any(String[].class), any(String.class)))
+        when(contentResolver.query(eq(TvContract.Channels.CONTENT_URI), eq(Channel.PROJECTION), isNull(), isNull(), isNull()))
                 .thenReturn(cursor);
 
         when(cursor.getCount())
@@ -113,7 +116,7 @@ public class ChannelDaoTest {
     public void testGetAllChannelsNoResults() {
         when(cursor.getCount())
                 .thenReturn(0);
-        when(contentResolver.query(any(Uri.class), any(String[].class), any(String.class), any(String[].class), any(String.class)))
+        when(contentResolver.query(eq(TvContract.Channels.CONTENT_URI), eq(Channel.PROJECTION), isNull(), isNull(), isNull()))
                 .thenReturn(cursor);
 
         List<Channel> channels = ChannelDao.getAllChannels(contentResolver);
@@ -123,7 +126,7 @@ public class ChannelDaoTest {
 
     @Test
     public void testGetAllChannelsNullCursor() {
-        when(contentResolver.query(any(Uri.class), any(String[].class), any(String.class), any(String[].class), any(String.class)))
+        when(contentResolver.query(eq(TvContract.Channels.CONTENT_URI), eq(Channel.PROJECTION), isNull(), isNull(), isNull()))
                 .thenReturn(null);
         assertNull(ChannelDao.getAllChannels(contentResolver));
     }

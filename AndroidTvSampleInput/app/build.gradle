@@ -1,13 +1,13 @@
 apply plugin: 'com.android.application'
 
 android {
-    compileSdkVersion 27
-    buildToolsVersion '27.1.1'
+    namespace 'com.example.android.sampletvinput'
 
     defaultConfig {
+        compileSdkVersion 34
         applicationId "com.example.android.sampletvinput"
-        minSdkVersion 21
-        targetSdkVersion 27
+        minSdkVersion 22
+        targetSdkVersion 34
         versionCode 2
         versionName "1.1"
     }
@@ -20,20 +20,9 @@ android {
     }
 }
 
-ext {
-    appCompatVersion = '27.1.1'
-}
-
 dependencies {
     implementation project(':library')
-    implementation "com.android.support:appcompat-v7:$appCompatVersion"
-    implementation "com.android.support:leanback-v17:$appCompatVersion"
-    implementation "com.android.support:recyclerview-v7:$appCompatVersion"
-    implementation 'com.google.android.exoplayer:exoplayer:r1.5.14'
-}
-
-configurations.all {
-    resolutionStrategy {
-        force 'com.android.support:support-v4:27.1.0'
-    }
+    implementation 'androidx.appcompat:appcompat:1.7.0'
+    implementation 'androidx.recyclerview:recyclerview:1.3.2'
+    implementation 'com.amazon.android:exoplayer:2.18.2'
 }
