@@ -13,41 +13,56 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package com.example.android.sampletvinput.rich;
 
-import android.content.ComponentName;
+import android.content.ContentResolver;
 import android.content.Context;
+import android.database.Cursor;
 import android.media.tv.TvContentRating;
+import android.media.tv.TvContract;
 import android.media.tv.TvInputManager;
+import android.media.tv.TvInputService;
+import android.media.tv.TvTrackInfo;
 import android.net.Uri;
-import android.os.Build;
 import android.os.Handler;
 import android.os.Looper;
 import android.util.Log;
-import android.view.LayoutInflater;
+import android.view.Surface;
 
-import com.example.android.sampletvinput.R;
-import com.example.android.sampletvinput.SampleJobService;
+import androidx.annotation.Nullable;
+
 import com.google.android.exoplayer2.ExoPlayer;
+import com.google.android.exoplayer2.Format;
 import com.google.android.exoplayer2.MediaItem;
 import com.google.android.exoplayer2.Player;
-import com.google.android.exoplayer2.ui.StyledPlayerView;
-import com.google.android.media.tv.companionlibrary.BaseTvInputService;
-import com.google.android.media.tv.companionlibrary.EpgSyncJobService;
-import com.google.android.media.tv.companionlibrary.TvPlayer;
-import com.google.android.media.tv.companionlibrary.model.Channel;
-import com.google.android.media.tv.companionlibrary.model.InternalProviderData;
-import com.google.android.media.tv.companionlibrary.model.Program;
+import com.google.android.exoplayer2.Tracks;
+
+import com.example.android.sampletvinput.SampleChannelManager;
+
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 /**
- * TvInputService which provides a full implementation of EPG, subtitles, multi-audio, parental
- * controls, and overlay view.
+ * TvInputService providing playback for the Fire TV Live TV UI.
+ *
+ * When a user tunes to a channel, Fire TV calls onCreateSession() to get a Session
+ * that handles playback via the provided Surface.
+ *
+ * Supports:
+ * - Preview playback (mini player when focusing on a channel tile)
+ * - Full-screen playback via the native Fire TV player
+ * - Parental controls (PCON)
+ * - Gracenote and Amazon catalog channels with external metadata
+ *
+ * See: https://developer.amazon.com/docs/fire-tv/playback-in-fire-tv-ui.html
  */
-public class RichTvInputService extends BaseTvInputService implements Player.Listener{
+public class RichTvInputService extends TvInputService {
     private static final String TAG = "RichTvInputService";
-    private static final boolean DEBUG = false;
-    private static final long EPG_SYNC_DELAYED_PERIOD_MS = 1000 * 2; // 2 Seconds
 
     @Override
     public void onCreate() {
@@ -55,169 +70,337 @@ public class RichTvInputService extends BaseTvInputService implements Player.Lis
     }
 
     @Override
-    public final Session onCreateSession(String inputId) {
-        RichTvInputSessionImpl session = new RichTvInputSessionImpl(this, inputId);
-        session.setOverlayViewEnabled(true);
-        return super.sessionCreated(session);
+    public Session onCreateSession(String inputId) {
+        Log.d(TAG, "onCreateSession: " + inputId);
+        return new RichTvInputSessionImpl(this, inputId);
     }
 
     /**
-     * The session implementation handles playback in Fire TV UI. This supports both preview playback
-     * as well as full playback in the native Fire TV player. 
+     * Session implementation for Fire TV Live TV playback.
+     *
+     * Fire TV calls onSetSurface() to provide a Surface for rendering, then onTune() to
+     * request playback of a specific channel. The session must:
+     * 1. Look up the channel and its current program
+     * 2. Resolve the video URL from the program's INTERNAL_PROVIDER_DATA
+     * 3. Start playback on the provided Surface
+     * 4. Notify Fire TV when video is available
+     * 5. Handle parental controls (PCON)
+     *
      */
-    class RichTvInputSessionImpl extends BaseTvInputService.Session {
-        private static final float CAPTION_LINE_HEIGHT_RATIO = 0.0533f;
-        private static final String GRACENOTE_ID = "gracenote_ontv";
+    private class RichTvInputSessionImpl extends TvInputService.Session {
 
-        // Example MPEG-DASH test content from Telecom Paris. Stream is licensed Creative Commons.
-        // See http://download.tsi.telecom-paristech.fr/gpac/dataset/dash/uhd/ for more information.
-        private static final String GRACENOTE_TEST_STREAM_URL = "http://download.tsi.telecom-paristech.fr/gpac/DASH_CONFORMANCE/TelecomParisTech/mp4-live/mp4-live-mpd-AV-NBS.mpd";
+        // Tears of Steel — (CC) Blender Foundation | mango.blender.org
+        // Used for every external-metadata (Gracenote/Amazon catalog) channel regardless
+        // of program for this demo app.
+        private static final String TEST_STREAM_URL =
+                "https://storage.googleapis.com/wvmedia/clear/h264/tears/tears.mpd";
 
-        private StyledPlayerView mPlayerView;
+        // JSON keys for INTERNAL_PROVIDER_DATA
+        private static final String KEY_EXTERNAL_ID_TYPE = "externalIdType";
+        private static final String KEY_VIDEO_URL = "videoUrl";
+
+        private final Context mContext;
+        private final String mInputId;
+        private final TvInputManager mTvInputManager;
+        private final ExecutorService mExecutor = Executors.newSingleThreadExecutor();
+        private final Handler mMainHandler = new Handler(Looper.getMainLooper());
+        private Surface mSurface;
         private ExoPlayer mPlayer;
-        private PlayerEventListener mPlayerListener;
-        private String mInputId;
-        private Context mContext;
+        private Uri mCurrentChannelUri;
+        private TvContentRating mBlockedRating;
+        private volatile boolean mReleased;
+        // Re-checks the channel when its program ends, so playback auto-advances.
+        // Tracked so a new tune or release can cancel a stale pending check.
+        private Runnable mAdvanceToNextProgramRunnable;
+        // Reapplied to each new player, since ExoPlayer always starts at full volume —
+        // otherwise a volume set before a re-tune would be lost.
+        private float mVolume = 1f;
 
         RichTvInputSessionImpl(Context context, String inputId) {
-            super(context, inputId);
+            super(context);
             mContext = context;
             mInputId = inputId;
-            mPlayerListener = new PlayerEventListener();
+            mTvInputManager = (TvInputManager) context.getSystemService(Context.TV_INPUT_SERVICE);
         }
 
         /**
-         * PLAYBACK-FTVUI 7: onPlayProgram()
-         * This method checks for a valid program and then creates the DemoPlayer object and flags
-         * it to play when ready
+         * Called by Fire TV to provide the Surface for video rendering.
+         * Store it and pass to the player when playback starts.
+         *
          */
         @Override
-        public boolean onPlayProgram(Program program, long startPosMs, Channel channel) {
-            // Play the specified program (if it exists).
-            boolean programExists = (null != program);
-            if (programExists) {
-                // The feed for the program is stored in its internalProviderData column.
-                createPlayer(Uri.parse(program.getInternalProviderData().getVideoUrl()));
-                if (startPosMs > 0) {
-                    mPlayer.seekTo(startPosMs);
-                }
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                    notifyTimeShiftStatusChanged(TvInputManager.TIME_SHIFT_STATUS_AVAILABLE);
-                }
-                mPlayer.setPlayWhenReady(true);
-                return true;
+        public boolean onSetSurface(@Nullable Surface surface) {
+            mSurface = surface;
+            if (mPlayer != null) {
+                mPlayer.setVideoSurface(surface);
             }
-
-            // Determine if the channel being played is populated with program metadata from an external
-            // catalog. The `program` argument of this method only refers to TIF-based program metadata,
-            // so if external catalog data is being used, the missing program is expected and we should
-            // display content based on the channel alone.
-            //
-            // NOTE: "External catalog" can refer to either Gracenote or to Amazon's native catalog.
-            //       See https://developer.amazon.com/docs/catalog/getting-started-catalog-ingestion.html.
-            boolean canPlayFromExternalCatalogData = false;
-            boolean channelExists = (null != channel);
-            if (channelExists) {
-                InternalProviderData channelInternalProviderData = channel.getInternalProviderData();
-                boolean channelHasInternalProviderData = (null != channelInternalProviderData);
-                if (channelHasInternalProviderData) {
-                    String channelExternalIdType = channelInternalProviderData.getExternalIdType();
-                    boolean channelHasExternalIdType = (null != channelExternalIdType);
-                    if (channelHasExternalIdType) {
-                        canPlayFromExternalCatalogData = channelExternalIdType.equals(GRACENOTE_ID);
-                    }
-                }
-            }
-
-            // Play content for the specified channel (if possible).
-            if (canPlayFromExternalCatalogData) {
-                // A simple test stream is played for all Gracenote channels. A production-ready implementation
-                // would obviously be more complex and would need to select the appropriate stream for the channel.
-                createPlayer(
-                        Uri.parse(GRACENOTE_TEST_STREAM_URL));
-                mPlayer.setPlayWhenReady(true);
-                return true;
-            }
-
-            // A program was not specified and either a channel was not specified or the specified channel
-            // does not get metadata from an external catalog, so we have nothing to display. We can request
-            // an EPG sync in case that resolves the metadata issue within the TIF database.
-            requestEpgSync(getCurrentChannelUri());
-            notifyVideoUnavailable(TvInputManager.VIDEO_UNAVAILABLE_REASON_TUNING);
-            return false;
-        }
-
-        public TvPlayer getTvPlayer() {
-            return (TvPlayer) mPlayer;
+            return true;
         }
 
         /**
-         * onTune is the initial call made by Fire TV into the app when the user triggers
-         * playback in the Fire TV UI. Follow these comments tagged with "PLAYBACK-FTVUI" to trace the full
-         * flow of playback as implemented in this sample app.
-         * <p>
-         * PLAYBACK-FTVUI 1: onTune
+         * Called by Fire TV when the user tunes to a channel.
+         * This is the main entry point for playback.
+         *
+         * Flow:
+         * 1. Notify Fire TV we are tuning (shows loading state)
+         * 2. Check parental controls — if enabled, block and wait for PIN
+         * 3. If not blocked, resolve video URL on a background thread
+         * 4. Create player and start playback on the main thread
+         *
          */
         @Override
         public boolean onTune(Uri channelUri) {
-            if (DEBUG) {
-                Log.d(TAG, "Tune to " + channelUri.toString());
-            }
-            // This notification tells Fire TV that we are currently tuning to the requested channel
+            Log.d(TAG, "onTune: " + channelUri);
+
+            // Notify Fire TV that tuning is in progress
             notifyVideoUnavailable(TvInputManager.VIDEO_UNAVAILABLE_REASON_TUNING);
-            // When tuning we always release any prior playback state
+
+            // Release any prior playback
             releasePlayer();
-            return super.onTune(channelUri);
+
+            // Store current channel for use in onUnblockContent
+            mCurrentChannelUri = channelUri;
+
+            long channelId = Long.parseLong(channelUri.getLastPathSegment());
+            if (mTvInputManager.isParentalControlsEnabled()) {
+                mBlockedRating = getContentRating(channelId);
+                notifyContentBlocked(mBlockedRating);
+                return true;
+            }
+            notifyContentAllowed();
+            resolveAndPlay(channelId, channelUri);
+
+            return true;
         }
 
+        /**
+         * Called when the user enters their PIN to unblock content.
+         * Resolve the stream for the previously blocked channel and start playback.
+         */
         @Override
-        public void onSetCaptionEnabled(boolean enabled) {
-            // stub
+        public void onUnblockContent(TvContentRating unblockedRating) {
+            Log.d(TAG, "onUnblockContent: " + unblockedRating);
+            if (unblockedRating.equals(mBlockedRating)) {
+                mBlockedRating = null;
+                notifyContentAllowed();
+
+                final Uri channelUri = mCurrentChannelUri;
+                if (channelUri != null) {
+                    resolveAndPlay(Long.parseLong(channelUri.getLastPathSegment()), channelUri);
+                }
+            }
+        }
+
+        /**
+         * Resolves the video URL for a channel on a background thread (resyncing the EPG once
+         * if the first lookup fails) and starts playback on the main thread. Shared by onTune()'s
+         * non-blocked path and onUnblockContent(), since a blocked tune skips this work until
+         * the content is unblocked.
+         */
+        private void resolveAndPlay(long channelId, Uri channelUri) {
+            mExecutor.execute(() -> {
+                String videoUrl = resolveVideoUrl(channelId);
+
+                // If no video URL found, the EPG may be stale (schedule expired).
+                // Trigger a resync and retry once.
+                if (videoUrl == null) {
+                    Log.w(TAG, "No video URL for channel " + channelId + ", resyncing EPG");
+                    SampleChannelManager.syncChannels(mContext);
+                    videoUrl = resolveVideoUrl(channelId);
+                }
+
+                final String finalUrl = videoUrl;
+                final long endTimeUtcMillis = queryCurrentProgramEndTime(channelId);
+                mMainHandler.post(() -> {
+                    // A newer onTune() may have superseded this one while resolution was
+                    // running in the background — don't apply a stale result.
+                    if (mReleased || !channelUri.equals(mCurrentChannelUri)) return;
+                    if (finalUrl != null) {
+                        createPlayer(Uri.parse(finalUrl));
+                        scheduleNextProgramCheck(channelId, channelUri, endTimeUtcMillis);
+                    } else {
+                        Log.w(TAG, "Could not resolve video URL for channel " + channelId
+                                + " even after resync");
+                        notifyVideoUnavailable(TvInputManager.VIDEO_UNAVAILABLE_REASON_UNKNOWN);
+                    }
+                });
+            });
+        }
+
+        /**
+         * Schedules a re-check of this channel at the current program's scheduled end time, so
+         * playback advances to the next program without the user needing to re-tune. Replaces
+         * any previously scheduled check for this session.
+         */
+        private void scheduleNextProgramCheck(long channelId, Uri channelUri, long endTimeUtcMillis) {
+            mMainHandler.removeCallbacks(mAdvanceToNextProgramRunnable);
+            if (endTimeUtcMillis <= 0) {
+                return;
+            }
+            mAdvanceToNextProgramRunnable = () -> {
+                if (mReleased || !channelUri.equals(mCurrentChannelUri)) return;
+                Log.d(TAG, "Program ended on channel " + channelId + ", advancing");
+                resolveAndPlay(channelId, channelUri);
+            };
+            long delayMs = Math.max(endTimeUtcMillis - System.currentTimeMillis(), 0);
+            mMainHandler.postDelayed(mAdvanceToNextProgramRunnable, delayMs);
         }
 
         @Override
         public void onRelease() {
-            super.onRelease();
+            mReleased = true;
             releasePlayer();
+            mExecutor.shutdownNow();
+            mMainHandler.removeCallbacks(mAdvanceToNextProgramRunnable);
         }
 
         @Override
-        public void onBlockContent(TvContentRating rating) {
-            super.onBlockContent(rating);
-            releasePlayer();
+        public void onSetStreamVolume(float volume) {
+            mVolume = volume;
+            if (mPlayer != null) {
+                mPlayer.setVolume(volume);
+            }
         }
 
-        public void requestEpgSync(final Uri channelUri) {
-            EpgSyncJobService.requestImmediateSync(RichTvInputService.this, mInputId,
-                    new ComponentName(RichTvInputService.this, SampleJobService.class));
-            new Handler(Looper.getMainLooper()).postDelayed(new Runnable() {
-                @Override
-                public void run() {
-                    onTune(channelUri);
-                }
-            }, EPG_SYNC_DELAYED_PERIOD_MS);
+        @Override
+        public void onSetCaptionEnabled(boolean enabled) {
+            // No captions in this sample
         }
 
         /**
-         * PLAYBACK-FTVUI 8: createPlayer()
-         * Creates the player with the specific video url for the program.
+         * Returns the content rating for the currently-airing program on this channel.
+         */
+        private TvContentRating getContentRating(long channelId) {
+            ContentResolver resolver = mContext.getContentResolver();
+            long now = System.currentTimeMillis();
+            Uri programUri = TvContract.buildProgramsUriForChannel(channelId, now, now + 1);
+
+            try (Cursor cursor = resolver.query(programUri,
+                    new String[]{TvContract.Programs.COLUMN_CONTENT_RATING},
+                    null, null, null)) {
+                if (cursor != null && cursor.moveToFirst()) {
+                    String ratingStr = cursor.getString(0);
+                    if (ratingStr != null && !ratingStr.isEmpty()) {
+                        return TvContentRating.unflattenFromString(ratingStr);
+                    }
+                }
+            } catch (Exception e) {
+                Log.e(TAG, "Error querying content rating", e);
+            }
+
+            // Fallback — a rating is always required for notifyContentBlocked()
+            return TvContentRating.createRating("com.android.tv", "US_TV", "US_TV_PG");
+        }
+
+        /**
+         * Returns the current program's scheduled end time on the given channel, or -1 if
+         * there's no current program. Used to schedule automatic advancement to the next
+         * program (see scheduleNextProgramCheck()).
+         */
+        private long queryCurrentProgramEndTime(long channelId) {
+            ContentResolver resolver = mContext.getContentResolver();
+            // A 1ms window at "now" returns exactly the program airing at this instant
+            // (its start_time <= now < end_time).
+            long now = System.currentTimeMillis();
+            Uri programUri = TvContract.buildProgramsUriForChannel(channelId, now, now + 1);
+
+            try (Cursor cursor = resolver.query(programUri,
+                    new String[]{TvContract.Programs.COLUMN_END_TIME_UTC_MILLIS},
+                    null, null, null)) {
+                if (cursor != null && cursor.moveToFirst()) {
+                    return cursor.getLong(0);
+                }
+            } catch (Exception e) {
+                Log.e(TAG, "Error querying program end time", e);
+            }
+
+            return -1;
+        }
+
+        /**
+         * Resolves the video URL for a given channel.
+         *
+         * Logic:
+         * 1. Check channel's INTERNAL_PROVIDER_DATA for external metadata (Gracenote/Amazon catalog)
+         *    → if present, use test stream URL
+         * 2. Look up current program for the channel
+         *    → get video URL from program's INTERNAL_PROVIDER_DATA
+         * 3. If no program found, return null
+         */
+        private String resolveVideoUrl(long channelId) {
+            ContentResolver resolver = mContext.getContentResolver();
+
+            // Step 1: Check if this is an external metadata channel (Gracenote/Amazon catalog)
+            Uri channelUri = TvContract.buildChannelUri(channelId);
+            try (Cursor cursor = resolver.query(channelUri,
+                    new String[]{TvContract.Channels.COLUMN_INTERNAL_PROVIDER_DATA},
+                    null, null, null)) {
+                if (cursor != null && cursor.moveToFirst()) {
+                    byte[] data = cursor.getBlob(0);
+                    if (data != null) {
+                        String json = new String(data);
+                        JSONObject channelData = new JSONObject(json);
+                        String externalIdType = channelData.optString(KEY_EXTERNAL_ID_TYPE, null);
+                        if (externalIdType != null) {
+                            // External metadata channel (Gracenote or Amazon catalog) — play test stream
+                            Log.d(TAG, "External metadata channel (" + externalIdType + "), using test stream");
+                            return TEST_STREAM_URL;
+                        }
+                    }
+                }
+            } catch (JSONException e) {
+                Log.e(TAG, "Error parsing channel internal provider data", e);
+            }
+
+            // Step 2: Look up current program for this channel
+            // A 1ms window at "now" returns exactly the program airing at this instant
+            // (its start_time <= now < end_time).
+            long now = System.currentTimeMillis();
+            Uri programUri = TvContract.buildProgramsUriForChannel(channelId, now, now + 1);
+            try (Cursor cursor = resolver.query(programUri,
+                    new String[]{TvContract.Programs.COLUMN_INTERNAL_PROVIDER_DATA},
+                    null, null, null)) {
+                if (cursor != null && cursor.moveToFirst()) {
+                    byte[] data = cursor.getBlob(0);
+                    if (data != null) {
+                        String json = new String(data);
+                        JSONObject programData = new JSONObject(json);
+                        String videoUrl = programData.optString(KEY_VIDEO_URL, null);
+                        if (videoUrl != null) {
+                            return videoUrl;
+                        }
+                    }
+                }
+            } catch (JSONException e) {
+                Log.e(TAG, "Error parsing program internal provider data", e);
+            }
+
+            Log.w(TAG, "No video URL found for channel " + channelId);
+            return null;
+        }
+
+        /**
+         * Creates an ExoPlayer instance and starts playback on the provided Surface.
+         * Notifies Fire TV when video becomes available.
+         *
          */
         private void createPlayer(Uri videoUrl) {
             releasePlayer();
-            mPlayer = new ExoPlayer.Builder(mContext)
-                    .build();
-            LayoutInflater inflater = (LayoutInflater) getSystemService(LAYOUT_INFLATER_SERVICE);
-            mPlayerView = (StyledPlayerView) inflater.inflate(R.layout.demo_player_activity, null);
-            mPlayerView.setPlayer(mPlayer);
-            mPlayer.addListener(mPlayerListener);
-            mPlayer.addMediaItem(MediaItem.fromUri(videoUrl));
+
+            mPlayer = new ExoPlayer.Builder(mContext).build();
+            mPlayer.setVideoSurface(mSurface);
+            mPlayer.setVolume(mVolume);
+            mPlayer.addListener(new PlayerEventListener());
+            mPlayer.setMediaItem(MediaItem.fromUri(videoUrl));
             mPlayer.setPlayWhenReady(true);
             mPlayer.prepare();
+
+            // Logged for demo visibility only.
+            Log.d(TAG, "Player created, preparing: " + videoUrl);
         }
 
         private void releasePlayer() {
             if (mPlayer != null) {
-                mPlayer.removeListener(mPlayerListener);
                 mPlayer.setVideoSurface(null);
                 mPlayer.stop();
                 mPlayer.release();
@@ -225,29 +408,66 @@ public class RichTvInputService extends BaseTvInputService implements Player.Lis
             }
         }
 
+        /**
+         * Listens for player state changes and notifies Fire TV when playback is ready.
+         *
+         * 1. onTracksChanged() fires during prepare() — report tracks to Fire TV
+         * 2. onPlaybackStateChanged(STATE_READY) fires when the player can play immediately —
+         *    notify video available
+         */
         private class PlayerEventListener implements Player.Listener {
-            /**
-             * PLAYBACK-FTVUI 9: onStateChanged()
-             * Triggered by the DemoPlayer once playback begins. Invokes critical notifications back to Fire TV UI to complete the flow.
-             */
             @Override
-            public void onPlayerStateChanged(boolean playWhenReady, @Player.State int playbackState) {
-                if (mPlayer == null) {
-                    return;
+            public void onTracksChanged(Tracks tracks) {
+                if (mPlayer == null) return;
+
+                List<TvTrackInfo> tvTracks = new ArrayList<>();
+                for (Tracks.Group trackGroup : tracks.getGroups()) {
+                    for (int i = 0; i < trackGroup.length; i++) {
+                        if (trackGroup.isTrackSelected(i)) {
+                            Format format = trackGroup.getTrackFormat(i);
+                            if (format.sampleMimeType != null) {
+                                if (format.sampleMimeType.startsWith("video/")) {
+                                    tvTracks.add(new TvTrackInfo.Builder(
+                                            TvTrackInfo.TYPE_VIDEO, "video_0")
+                                            .setVideoWidth(format.width)
+                                            .setVideoHeight(format.height)
+                                            .build());
+                                } else if (format.sampleMimeType.startsWith("audio/")) {
+                                    tvTracks.add(new TvTrackInfo.Builder(
+                                            TvTrackInfo.TYPE_AUDIO, "audio_0")
+                                            .setAudioChannelCount(format.channelCount)
+                                            .setAudioSampleRate(format.sampleRate)
+                                            .build());
+                                }
+                            }
+                        }
+                    }
                 }
 
-                if (playWhenReady && playbackState == ExoPlayer.STATE_READY) {
-                    // These notifications alert the Fire TV UI that the player is ready to playback
-                    // These two calls must fire only once the player is fully ready to play
+                notifyTracksChanged(tvTracks);
+                for (TvTrackInfo track : tvTracks) {
+                    notifyTrackSelected(track.getType(), track.getId());
+                }
+                notifyTrackSelected(TvTrackInfo.TYPE_SUBTITLE, null);
+            }
+
+            @Override
+            public void onPlaybackStateChanged(@Player.State int playbackState) {
+                if (mPlayer == null) return;
+
+                if (playbackState == Player.STATE_READY && mPlayer.getPlayWhenReady()) {
                     notifyVideoAvailable();
-                    notifyContentAllowed();
-                } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M &&
-                        Math.abs(mPlayer.getPlaybackParameters().speed - 1.0f) < 0.1 &&
-                        playWhenReady && playbackState == ExoPlayer.STATE_BUFFERING) {
+                    Log.d(TAG, "Playback ready, notified Fire TV");
+                } else if (playbackState == Player.STATE_BUFFERING) {
                     notifyVideoUnavailable(TvInputManager.VIDEO_UNAVAILABLE_REASON_BUFFERING);
                 }
             }
+
+            @Override
+            public void onPlayerError(com.google.android.exoplayer2.PlaybackException error) {
+                Log.e(TAG, "Player error: " + error.getMessage(), error);
+                notifyVideoUnavailable(TvInputManager.VIDEO_UNAVAILABLE_REASON_UNKNOWN);
+            }
         }
     }
-
 }

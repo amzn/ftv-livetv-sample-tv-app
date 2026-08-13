@@ -4,7 +4,7 @@ android {
     namespace 'com.example.android.sampletvinput'
 
     defaultConfig {
-        compileSdkVersion 34
+        compileSdkVersion 35
         applicationId "com.example.android.sampletvinput"
         minSdkVersion 22
         targetSdkVersion 34
@@ -21,8 +21,9 @@ android {
 }
 
 dependencies {
-    implementation project(':library')
-    implementation 'androidx.appcompat:appcompat:1.7.0'
-    implementation 'androidx.recyclerview:recyclerview:1.3.2'
+    implementation 'androidx.tvprovider:tvprovider:1.1.0'
+    implementation 'androidx.leanback:leanback:1.2.0'
+    implementation 'androidx.work:work-runtime:2.10.5'
+    implementation platform('org.jetbrains.kotlin:kotlin-bom:1.8.22')
     implementation 'com.amazon.android:exoplayer:2.18.2'
 }

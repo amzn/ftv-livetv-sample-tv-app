@@ -8,11 +8,11 @@ If your application provides live content, you can surface it in the Fire TV's C
 
 ## Fire TV supports the following Live TV features:
 - Linear channel tiles appear in Fire TV home and live tab for customers entitled to your content
-- Channels appear in Fire TV's channel guide woth 14 days of programming
+- Channels appear in Fire TV's channel guide with 14 days of programming
 - Playback integrated in Fire TV UI
 - Channel tiles can deeplink directly into your app
 - Search for station and programming information for next 14 days
-- Alexa support for utterances such as “Tune to [channel_name]” and "Tune to channel [channel_number]"
+- Alexa support for utterances such as "Tune to [channel_name]" and "Tune to channel [channel_number]"
 - Ability to favorite channels from browse and search experiences
 - Option to provide deep link to playback
 
@@ -23,11 +23,15 @@ If your application provides live content, you can surface it in the Fire TV's C
 ![TIF Diagram](tif-diagram.png "TIF Implementation Flow")
 
 ## Quick Links
-- [RichTvInputService](AndroidTvSampleInput/app/src/main/java/com/example/android/sampletvinput/rich/RichTvInputService.java) - Implementation of Android TV TvInputService. This builds on the base class [BaseTvInputService](AndroidTvSampleInput/library/src/main/java/com/google/android/media/tv/companionlibrary/BaseTvInputService.java). This includes the integration with [playback](AndroidTvSampleInput/app/src/main/java/com/example/android/sampletvinput/rich/RichTvInputService.java#L228) in the Fire TV UI.
-- [EpgJobSyncService](AndroidTvSampleInput/library/src/main/java/com/google/android/media/tv/companionlibrary/EpgSyncJobService.java) - This is an abstract class with the majority of an implementation of Android's JobService to be used with the Job Scheduler. Abstract methods GetChannels() and GetProgramsForChannel() are implemented in the [SampleJobService](AndroidTvSampleInput/app/src/main/java/com/example/android/sampletvinput/SampleJobService.java). This holds the core logic of maintaining up to date channel and program metadata in the TIF database.
-- [TvContractUtils](AndroidTvSampleInput/library/src/main/java/com/google/android/media/tv/companionlibrary/utils/TvContractUtils.java) - Utility class demonstrating insertion and retrieval of program and channel data in the Tv Input Framework (TIF) database.
-- [DemoPlayer](AndroidTvSampleInput/app/src/main/java/com/example/android/sampletvinput/player/DemoPlayer.java) - Example of integration with ExoPlayer to support playback in Fire TV UI (in coordination with the RichTvInputService) as well as in app playback.
-- [DemoPlayerActivity](AndroidTvSampleInput/app/src/main/java/com/example/android/sampletvinput/DemoPlayerActivity.java) - Example of handling the deeplink intent URI to support playback in-app when requested by the user from the Fire TV UI.
+- [RichTvInputService](AndroidTvSampleInput/app/src/main/java/com/example/android/sampletvinput/rich/RichTvInputService.java) - Implementation of Android TV TvInputService. Handles live preview playback on the Fire TV Surface, parental controls (PCON), and track notifications.
+- [SampleChannelManager](AndroidTvSampleInput/app/src/main/java/com/example/android/sampletvinput/SampleChannelManager.java) - Channel and program sync logic. Performs diff-based updates using `ContentProviderOperation` batch, persists the channel ID routing map to SharedPreferences, and inserts a 24-hour rolling program schedule.
+- [ChannelSyncWorker](AndroidTvSampleInput/app/src/main/java/com/example/android/sampletvinput/ChannelSyncWorker.java) - WorkManager periodic background sync (24-hour interval).
+- [InitializationReceiver](AndroidTvSampleInput/app/src/main/java/com/example/android/sampletvinput/InitializationReceiver.java) - BroadcastReceiver for `INITIALIZE_PROGRAMS`. Triggers channel sync after app install without requiring the user to open the app.
+- [RichBootReceiver](AndroidTvSampleInput/app/src/main/java/com/example/android/sampletvinput/rich/RichBootReceiver.java) - BroadcastReceiver for `BOOT_COMPLETED` and `MY_PACKAGE_REPLACED`. Ensures channels are synced after device restart or app update.
+- [RichTvInputSetupActivity](AndroidTvSampleInput/app/src/main/java/com/example/android/sampletvinput/rich/RichTvInputSetupActivity.java) - SetupActivity launched from Settings > Live TV > Sync Sources. Shows progress UI, runs sync, and auto-exits.
+- [DemoPlayerActivity](AndroidTvSampleInput/app/src/main/java/com/example/android/sampletvinput/DemoPlayerActivity.java) - Handles the deeplink intent URI to support playback in-app when requested by the user from the Fire TV UI.
+- [RichFeedUtil](AndroidTvSampleInput/app/src/main/java/com/example/android/sampletvinput/rich/RichFeedUtil.java) - Parses the bundled sample XMLTV feed, standing in for the catalog or EPG data a real app would fetch from its data source.
+- [MainActivity](AndroidTvSampleInput/app/src/main/java/com/example/android/sampletvinput/MainActivity.java) - Launcher entry point. Shows the Amazon Live TV developer documentation page when the app is launched.
 
 ## Fire TV Metadata Fields
 ### Channel Fields currently supported by Fire TV
@@ -49,20 +53,14 @@ These are the fields currently supported in the Fire TV UI for Program objects i
 - `endTimeUtcMillis` - the end time of the program, in format of millisecond in UTC time
 - `contentRating` - the standard tv content rating. Ex: TV-PG
 - `episodeTitle` - the title of the specific episode of the playing program
-- `shortDesciption` - the short description of the program
+- `shortDescription` - the short description of the program
 - `longDescription` - the long description of the program. If this field is provided, it will override the "shortDescription" above.
 - `thumbnailUri` - Small image for the program
 - `posterArtUri` - Poster art image for the program
 
 ### Note on Program and Channel Models
 
-This repository contains implementations of the Program object which represents data pushed to the TIF programs table as well as the Channel object which represents data pushed to the TIF channels table. Additionally the repository implements an InternalProviderData object to represent data stored in the InternalProviderData column on the programs and channels tables.
-
-You may utilize these implementations within your own app or use Android library implementations. Android provides these models in two places:
-
-`com.google.android.libraries.tv:companionlibrary:0.4.1`
-and the AndroidX library
-`androidx.tvprovider:tvprovider:1.0.0`. The models in these libaries are equivalent to the implementations in this repository with the exception of accepting the InternalProviderData object. Instead those models will take the serialized blob instead.
+Android provides program and channel model helpers in `androidx.tvprovider:tvprovider` (e.g., `Channel.Builder`, `Program.Builder`). This sample uses direct `ContentValues` with `TvContract` columns instead, but you may use the AndroidX helpers if preferred.
 
 ## Questions, Support, and Feedback
 If you have further questions, support or feedback needs please reach out to your Amazon contact who will be able to further assist you. If you have general feedback for the code examples here, feel free to raise a GitHub issue in this repository.

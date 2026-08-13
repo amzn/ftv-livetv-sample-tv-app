@@ -13,50 +13,52 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package com.example.android.sampletvinput.rich;
 
-import android.app.job.JobInfo;
-import android.app.job.JobScheduler;
 import android.content.BroadcastReceiver;
-import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
-import android.os.Build;
+import android.util.Log;
 
-import com.example.android.sampletvinput.SampleJobService;
-import com.google.android.media.tv.companionlibrary.EpgSyncJobService;
+import com.example.android.sampletvinput.ChannelSyncWorker;
+import com.example.android.sampletvinput.SampleChannelManager;
 
-import java.util.List;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 /**
- * This BroadcastReceiver is set up to make sure sync job can schedule after reboot. Because
- * JobScheduler doesn't work well on reboot scheduler on L/L-MR1.
+ * BroadcastReceiver that triggers channel sync after device boot or app update.
+ * Ensures channels are always present in the TIF database without requiring the user
+ * to manually open the app.
+ *
+ * Responds to:
+ * - BOOT_COMPLETED: device restarted
+ * - MY_PACKAGE_REPLACED: app was updated
+ *
+ * Uses goAsync() + Executor to move the sync off the main thread and avoid an ANR.
  */
-public class RichBootReceiver extends BroadcastReceiver{
+public class RichBootReceiver extends BroadcastReceiver {
+    private static final String TAG = "RichBootReceiver";
+
+    private static final ExecutorService SYNC_EXECUTOR = Executors.newSingleThreadExecutor();
+
     @Override
     public void onReceive(Context context, Intent intent) {
-        JobScheduler jobScheduler =
-                (JobScheduler) context.getSystemService(Context.JOB_SCHEDULER_SERVICE);
-        // If there are not pending jobs. Create a sync job and schedule it.
-        List<JobInfo> pendingJobs = jobScheduler.getAllPendingJobs();
-        if (pendingJobs.isEmpty()) {
-            String inputId = context.getSharedPreferences(EpgSyncJobService.PREFERENCE_EPG_SYNC,
-                    Context.MODE_PRIVATE).getString(EpgSyncJobService.BUNDLE_KEY_INPUT_ID, null);
-            if (inputId != null) {
-                // Set up periodic sync only when input has set up.
-                EpgSyncJobService.setUpPeriodicSync(context, inputId,
-                        new ComponentName(context, SampleJobService.class));
-            }
-            return;
-        }
-        // On L/L-MR1, reschedule the pending jobs.
-        if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.LOLLIPOP_MR1) {
-            for (JobInfo job : pendingJobs) {
-                if (job.isPersisted()) {
-                    jobScheduler.schedule(job);
+        String action = intent.getAction();
+        Log.d(TAG, "Received: " + action);
+
+        if (Intent.ACTION_BOOT_COMPLETED.equals(action) ||
+                Intent.ACTION_MY_PACKAGE_REPLACED.equals(action)) {
+            final PendingResult pendingResult = goAsync();
+            SYNC_EXECUTOR.execute(() -> {
+                try {
+                    SampleChannelManager.syncChannels(context.getApplicationContext());
+                    ChannelSyncWorker.schedule(context.getApplicationContext(),
+                            ChannelSyncWorker.SYNC_INTERVAL_HOURS);
+                } finally {
+                    pendingResult.finish();
                 }
-            }
+            });
         }
     }
 }

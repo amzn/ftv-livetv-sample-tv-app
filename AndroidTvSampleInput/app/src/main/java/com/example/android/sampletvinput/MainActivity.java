@@ -13,19 +13,28 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package com.example.android.sampletvinput;
 
 import android.app.Activity;
 import android.os.Bundle;
+import android.webkit.WebView;
+import android.webkit.WebViewClient;
 
 /**
- * MainActivity class that loads {@link MainFragment}.
+ * MainActivity that shows the Amazon Live TV developer integration page when the app is launched.
  */
 public class MainActivity extends Activity {
+
+    private static final String AMAZON_LIVE_TV_DEV_INTEGRATION_URL =
+            "https://developer.amazon.com/docs/fire-tv/introduction-linear-tv-integration.html";
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.main);
+
+        WebView webView = new WebView(this);
+        webView.setWebViewClient(new WebViewClient());
+        webView.loadUrl(AMAZON_LIVE_TV_DEV_INTEGRATION_URL);
+        setContentView(webView);
     }
 }

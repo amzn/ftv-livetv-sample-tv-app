@@ -31,6 +31,9 @@
     please see {@link JobInfo.Builder#setPersisted}-->
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED"/>
 
+    <!-- Required to write channel genre data to the Amazon TIF extension provider. -->
+    <uses-permission android:name="com.amazon.tv.permission.TIF_EXTENSION_ACCESS"/>
+
     <uses-feature
         android:name="android.hardware.touchscreen"
         android:required="false" />
@@ -66,19 +69,13 @@
             </intent-filter>
         </activity>
         <!-- Launched by the TV app before it uses RichTvInputService. This registers channels and
-        sets up SampleJobService to provide program information in the background. -->
+        sets up SampleChannelManager to provide program information in the background. -->
         <activity android:name=".rich.RichTvInputSetupActivity"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
             </intent-filter>
         </activity>
-
-        <!-- A full-screen activity which will be launched by the TV app when a user clicks
-        the app-link connected to this activity. -->
-
-        <!-- A side-panel activity which will be launched by the TV app when a user clicks
-        the app-link connected to this activity. -->
 
         <!-- TV input which provides channels based on the streaming contents.
         Requires "android.permission.BIND_TV_INPUT" to ensure that only system services can bind.
@@ -101,17 +98,12 @@
                 android:resource="@xml/richtvinputservice" />
         </service>
 
-        <!-- This service is for using JobScheduler to sync EPG data. -->
-        <service
-            android:name=".SampleJobService"
-            android:permission="android.permission.BIND_JOB_SERVICE"
-            android:exported="true" />
-
         <!-- This receiver is for sync job schedule well after reboot. -->
         <receiver android:name=".rich.RichBootReceiver"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.BOOT_COMPLETED" />
+                <action android:name="android.intent.action.MY_PACKAGE_REPLACED" />
             </intent-filter>
         </receiver>
 
