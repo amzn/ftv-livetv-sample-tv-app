@@ -13,8 +13,34 @@
      See the License for the specific language governing permissions and
      limitations under the License.
 -->
-<fragment xmlns:android="http://schemas.android.com/apk/res/android"
-    android:id="@+id/rich_setup_frag"
-    android:name="com.example.android.sampletvinput.rich.RichSetupFragment"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
     android:layout_width="match_parent"
-    android:layout_height="match_parent" />
+    android:layout_height="match_parent"
+    android:gravity="center"
+    android:padding="24dp"
+    android:background="#FF1A1A2E">
+
+    <TextView
+        android:id="@+id/setup_title_text"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textSize="24sp"
+        android:textColor="#FFFFFFFF"
+        android:layout_marginBottom="8dp" />
+
+    <TextView
+        android:id="@+id/setup_message_text"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textSize="14sp"
+        android:textColor="#FFFFFFFF"
+        android:layout_marginBottom="24dp" />
+
+    <ProgressBar
+        android:id="@+id/setup_progress_bar"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="16dp" />
+
+</LinearLayout>
